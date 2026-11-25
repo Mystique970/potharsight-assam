@@ -1,0 +1,13 @@
+factor,change,spearman_rho,top5_overlap
+soil,-19%,1.0,5
+soil,+19%,1.0,5
+water,-19%,1.0,5
+water,+19%,1.0,5
+flood,-19%,1.0,5
+flood,+19%,1.0,5
+terrain,-19%,1.0,5
+terrain,+19%,1.0,5
+productivity,-19%,1.0,5
+productivity,+19%,1.0,5
+access,-19%,1.0,5
+access,+19%,1.0,5

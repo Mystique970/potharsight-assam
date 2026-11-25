@@ -1,0 +1,6 @@
+name,area_ha,candidate_ha,vacant_ha,long_fallow_ha,rabi_fallow_ha,S1_ha,S2_ha,S3_ha,constrained_ha,mean_score,main_limitation,priority_index,rank
+Sonai,82510.7,16282.7,221.5,2900.4,13160.8,13107.5,2482.7,690.8,1.4,84.0,soil fertility,12048.2,1
+Silchar,84072.1,10097.8,545.8,3628.1,5924.0,6024.4,2657.8,1412.6,3.0,81.2,soil fertility,5973.2,2
+Katigora,76594.3,9409.5,164.2,3771.4,5474.0,4565.7,3210.3,1592.7,40.8,78.4,soil fertility,4840.2,3
+Lakhipur,92355.3,4038.8,278.3,1143.1,2617.4,2980.1,747.4,311.2,0.0,83.1,water availability,2785.4,4
+Udarbond,43354.2,2948.0,315.4,737.9,1894.6,2041.6,682.7,218.0,5.6,82.2,water availability,1958.3,5

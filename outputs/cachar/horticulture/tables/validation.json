@@ -1,0 +1,13 @@
+{
+ "district": "cachar",
+ "profile": "horticulture",
+ "official_vacant_cultivable_ha": 26064,
+ "model_vacant_plus_long_fallow_ha": 13768,
+ "model_all_candidate_incl_rabi_fallow_ha": 42869,
+ "ratio_model_to_official": 0.53,
+ "active_farmland_share_scoring_S1_S2": 0.99,
+ "mean_score_active_farmland": 82.8,
+ "mean_score_candidate_land": 82.3,
+ "sensitivity_min_rho": 0.996,
+ "sensitivity_mean_top5_overlap": 5.0
+}

@@ -1,0 +1,10 @@
+name,area_ha,candidate_ha,vacant_ha,long_fallow_ha,rabi_fallow_ha,S1_ha,S2_ha,S3_ha,constrained_ha,mean_score,main_limitation,priority_index,rank
+Ghilamara,28936.4,3492.6,8.3,2110.2,1374.1,1553.8,1333.2,603.8,1.8,79.9,vegetation productivity,1774.7,1
+Narayanpur,35654.0,2698.1,30.0,457.2,2210.9,1573.9,942.3,181.9,0.0,81.6,water availability,1668.7,2
+Boginadi,51677.6,2888.7,1121.9,1710.2,56.6,580.2,1825.5,481.4,1.5,75.4,water availability,1126.0,3
+Bihpuria,16347.0,1326.9,50.3,750.5,526.0,1006.5,214.6,103.2,2.5,85.0,soil fertility,947.2,4
+Dhakuakhana,34056.6,1282.3,48.8,541.5,692.0,618.9,557.8,104.6,1.0,80.5,soil fertility,722.7,5
+Telahi,29893.5,1147.5,80.6,1034.8,32.1,642.8,371.0,128.9,4.9,81.8,soil fertility,677.9,6
+Lakhimpur,34264.6,1711.8,375.8,1084.0,251.9,217.0,1115.6,374.0,5.1,74.6,water availability,577.7,7
+Karunabari,23048.7,964.2,69.5,596.6,298.1,468.5,322.9,171.3,1.4,80.8,water availability,509.2,8
+Nowboicha,29576.2,1068.0,67.3,693.1,307.6,419.2,384.3,256.4,8.1,78.3,water availability,478.7,9

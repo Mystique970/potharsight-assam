@@ -1,0 +1,14 @@
+# raw/intermediate downloads are re-created by `python run_all.py --steps fetch`
+data/interim/
+pipeline.log
+outputs_*.log
+__pycache__/
+.env
+# stale duplicate from an earlier unzip
+NESFIC_D13/
+backup_pre_calibration/
+outputs/synthetic*/
+docs/DEMO_LOGIN.md
+
+# individual spot-check chips (contact sheets are kept)
+outputs/*/*/spot_check/chip_*.png

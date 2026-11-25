@@ -1,0 +1,13 @@
+{
+ "district": "kamrup",
+ "profile": "horticulture",
+ "official_vacant_cultivable_ha": 31453,
+ "model_vacant_plus_long_fallow_ha": 13651,
+ "model_all_candidate_incl_rabi_fallow_ha": 30005,
+ "ratio_model_to_official": 0.43,
+ "active_farmland_share_scoring_S1_S2": 0.934,
+ "mean_score_active_farmland": 80.1,
+ "mean_score_candidate_land": 78.5,
+ "sensitivity_min_rho": 0.996,
+ "sensitivity_mean_top5_overlap": 5.0
+}

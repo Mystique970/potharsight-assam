@@ -1,0 +1,13 @@
+{
+ "district": "dibrugarh",
+ "profile": "horticulture",
+ "official_vacant_cultivable_ha": 22546,
+ "model_vacant_plus_long_fallow_ha": 14435,
+ "model_all_candidate_incl_rabi_fallow_ha": 16020,
+ "ratio_model_to_official": 0.64,
+ "active_farmland_share_scoring_S1_S2": 0.99,
+ "mean_score_active_farmland": 84.7,
+ "mean_score_candidate_land": 78.1,
+ "sensitivity_min_rho": 1.0,
+ "sensitivity_mean_top5_overlap": 5.0
+}

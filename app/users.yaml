@@ -1,0 +1,12 @@
+# Portal accounts: salted PBKDF2-SHA256 hashes only. Create with tools/make_user.py
+users:
+  official:
+    name: District Agriculture Officer (demo)
+    role: official
+    salt: de444980c5c385dc5cab057d2f487fcb
+    hash: ef28a5c322aea7c39a9d7ea5d0658fda3496614a11799653e69d9b23fc9318ea
+  evaluator:
+    name: NESFIC Evaluator
+    role: official
+    salt: 304afd3582ee54013fd8bb6dafe4d986
+    hash: 5a8ae495315a6fcc7d60fcc3b1e4aa1626d68a14cf96f66b5b0c1492e0633d0f

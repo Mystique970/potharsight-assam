@@ -1,0 +1,117 @@
+# D13 – Cultivable & Fertile Agricultural Potential Land (Assam)
+# Everything district- or state-specific lives here. Adding a district = adding a block
+# under `districts`. Adding a state = pointing `boundaries` at that state's layers.
+
+project:
+  crs: "EPSG:32646"        # UTM 46N covers all of Assam
+  resolution_m: 30         # analysis grid
+  buffer_m: 1000           # AOI buffer for distance calculations
+  data_dir: "data"
+  output_dir: "outputs"
+
+boundaries:
+  districts: "data/boundaries/assam_districts.gpkg"   # geoBoundaries ADM2 (LGD-based, ODbL)
+  circles:   "data/boundaries/assam_circles.gpkg"     # geoBoundaries ADM3 (revenue circles / sub-districts)
+  blocks:    "data/boundaries/assam_blocks.gpkg"      # geoBoundaries ADM4 (development blocks)
+  name_field: "name"
+
+# Pilot districts (chosen on official vacant-cultivable land, DES Assam LUS 2020-21)
+districts:
+  kamrup:
+    boundary_name: "Kamrup"          # = Kamrup (Rural)
+    official_vacant_cultivable_ha: 31453
+  cachar:
+    boundary_name: "Cachar"
+    official_vacant_cultivable_ha: 26064
+  # Scale-out districts (ranks 3 and 4 in DES LUS 2020-21; boundaries unchanged by the 2022 mergers)
+  lakhimpur:
+    boundary_name: "Lakhimpur"
+    official_vacant_cultivable_ha: 23062
+  dibrugarh:
+    boundary_name: "Dibrugarh"
+    official_vacant_cultivable_ha: 22546
+
+sources:
+  stac_pc: "https://planetarycomputer.microsoft.com/api/stac/v1"
+  stac_earthsearch: "https://earth-search.aws.element84.com/v1"
+  soilgrids_vrt: "https://files.isric.org/soilgrids/latest/data/{prop}/{prop}_{depth}_mean.vrt"
+  chirps_annual:      # tried in order (CHIRPS v3 released 2025; v2 kept as fallback)
+    - "https://data.chc.ucsb.edu/products/CHIRPS/v3.0/annual/global/tifs/chirps-v3.0.{year}.tif"
+    - "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_annual/tifs/chirps-v2.0.{year}.tif"
+  worldcover_tile: "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N{lat:02d}E{lon:03d}_Map.tif"
+  cop_dem_tile: "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N{lat:02d}_00_E{lon:03d}_00_DEM/Copernicus_DSM_COG_10_N{lat:02d}_00_E{lon:03d}_00_DEM.tif"
+  esri_lulc_tile: "https://lulctimeseries.blob.core.windows.net/lulctimeseriesv003/lc{year}/{zone}_{year}0101-{y1}0101.tif"
+  esri_lulc_zones: ["46R"]   # MGRS zones covering the pilot districts
+  jrc_tile: "https://storage.googleapis.com/global-surface-water/downloads2021/occurrence/occurrence_{lon}E_{lat}Nv1_4_2021.tif"
+  overpass:
+    - "https://overpass-api.de/api/interpreter"
+    - "https://overpass.private.coffee/api/interpreter"
+    - "https://overpass.kumi.systems/api/interpreter"
+    - "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
+
+fetch:
+  esri_lulc_years: [2017, 2018, 2019, 2020, 2021, 2022, 2023]
+  s2_years: [2022, 2023, 2024]         # season start years
+  s2_max_cloud: 40
+  s2_items_per_tile_per_season: 3
+  s1_years: [2022, 2023, 2024]
+  s1_months: [6, 7, 8, 9]               # monsoon
+  s1_max_items_per_year: 10
+  chirps_years: [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023]
+  soil_props: ["soc", "phh2o", "nitrogen", "cec", "clay", "sand"]
+  soil_depths: ["0-5cm", "5-15cm", "15-30cm"]
+
+# Land-status thresholds (availability)
+availability:
+  permanent_water_occurrence: 40       # JRC % of time water
+  esri_water_years_exclude: 1          # water in any of the 7 Esri yearly maps = shifting river channel, excluded
+  open_land_worldcover: [20, 30, 100]  # shrub, grass, moss; bare (60) left out – in Assam floodplains it is mostly river sand
+  open_land_esri: [11]                 # Esri rangeland; Esri bare (8) left out for the same reason
+  fallow_kharif_ndvi_max: 0.50         # cropland whose kharif peak NDVI stays below this = long fallow
+                                       # (5th percentile of active farmland in Kamrup = 0.52)
+  undercropped_esri_classes: [11]      # Esri rangeland on WorldCover cropland = under-used cropland
+  fallow_rabi_ndvi_max: 0.35           # kharif-cropped land whose rabi peak NDVI stays below this = rabi fallow
+  min_patch_ha: 0.5
+  s1_qa_max_cropland_flood: 0.3        # if median S1 flood frequency on cropland exceeds this, use JRC/Esri proxy
+
+# Programme profiles: hard constraints differ by programme; weights can differ too.
+profiles:
+  field_crops:
+    label: "Field crops (rice, mustard, pulses)"
+    max_slope_pct: 15
+    max_flood_freq: 0.8
+    weights: {soil: 0.30, water: 0.20, flood: 0.15, terrain: 0.15, productivity: 0.10, access: 0.10}
+  horticulture:
+    label: "Horticulture (citrus, banana, vegetables)"
+    max_slope_pct: 30
+    max_flood_freq: 0.3
+    weights: {soil: 0.30, water: 0.15, flood: 0.20, terrain: 0.10, productivity: 0.10, access: 0.15}
+
+# Score -> class (0-100)
+classes:
+  S1: 80   # Highly suitable
+  S2: 65   # Moderately suitable
+  S3: 50   # Marginally suitable; below = N (not suitable)
+  # FAO "most limiting factor" rule: a very weak factor caps the class however good the rest are
+  cap_S2_if_any_factor_below: 40
+  cap_S3_if_any_factor_below: 20
+
+# Factor scoring thresholds (score 0..1); documented in docs/criteria_table.md
+# Soil ratings follow the Soil Health Card / ICAR norms; acidity is the main soil constraint in Assam.
+scoring:
+  soil_weights: {ph: 0.35, soc: 0.25, nitrogen: 0.15, cec: 0.15, clay: 0.10}
+  soc_gkg: [5, 15]          # linear 0 at 5, 1 at 15 (OC 0.5 % = low, >0.75 % = high on SHC)
+  ph_optimum: [6.0, 7.5]    # trapezoid, 1 inside (neutral)
+  ph_limits: [4.5, 8.5]     # 0 outside (strongly acidic / alkaline)
+  nitrogen_gkg: [0.5, 2.5]
+  cec_cmolkg: [5, 25]
+  clay_optimum: [15, 35]
+  clay_limits: [5, 60]
+  rain_optimum: [1500, 2500]  # trapezoid: deficit and excess both penalised
+  rain_limits: [1000, 4000]
+  dist_water_m: [250, 3000]   # 1 within 250 m, 0 beyond 3 km
+  flood_freq: [0.0, 0.4]      # 1 at 0, 0 at 0.4 of monsoon observations flooded
+  slope_pct: [2, 15]
+  ndvi_peak: [0.3, 0.85]
+  dist_road_m: [250, 5000]
+  dist_town_m: [3000, 25000]

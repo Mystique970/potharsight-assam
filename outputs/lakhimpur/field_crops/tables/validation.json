@@ -1,0 +1,13 @@
+{
+ "district": "lakhimpur",
+ "profile": "field_crops",
+ "official_vacant_cultivable_ha": 23062,
+ "model_vacant_plus_long_fallow_ha": 11402,
+ "model_all_candidate_incl_rabi_fallow_ha": 17220,
+ "ratio_model_to_official": 0.49,
+ "active_farmland_share_scoring_S1_S2": 0.91,
+ "mean_score_active_farmland": 80.9,
+ "mean_score_candidate_land": 79.5,
+ "sensitivity_min_rho": 1.0,
+ "sensitivity_mean_top5_overlap": 5.0
+}

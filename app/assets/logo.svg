@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="96" viewBox="0 0 460 96">
+  <rect x="4" y="4" width="88" height="88" rx="20" fill="#127a36"/>
+  <path d="M48 78 V40" stroke="#f2c80f" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="38" cy="40" rx="7" ry="13" transform="rotate(-25 38 40)" fill="#f2c80f"/>
+  <ellipse cx="58" cy="40" rx="7" ry="13" transform="rotate(25 58 40)" fill="#f2c80f"/>
+  <ellipse cx="48" cy="26" rx="6.5" ry="12" fill="#f2c80f"/>
+  <ellipse cx="36" cy="58" rx="6.5" ry="12" transform="rotate(-35 36 58)" fill="#9ee09e"/>
+  <ellipse cx="60" cy="58" rx="6.5" ry="12" transform="rotate(35 60 58)" fill="#9ee09e"/>
+  <path d="M14 82 Q48 70 82 82" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <text x="108" y="52" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="700" fill="#0b4d24">PotharSight</text>
+  <text x="110" y="80" font-family="Segoe UI, Arial, sans-serif" font-size="21" fill="#2f9e44">Assam · land for farming</text>
+</svg>
