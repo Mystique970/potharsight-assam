@@ -41,53 +41,59 @@ def check(username, password):
     return u if hmac.compare_digest(h, u["hash"]) else None
 
 
-def sign_in(uid, user):
-    st.session_state.user = {"id": uid, "name": user.get("name", uid), "role": user.get("role", "official")}
-    st.rerun()
+def sign_in(uid, password):
+    """Button callback: runs before the next script run, so the portal draws straight away (no second rerun)."""
+    u = check(uid, password)
+    if u:
+        st.session_state.user = {"id": uid.strip().lower(), "name": u.get("name", uid), "role": u.get("role", "official")}
+        st.session_state.pop("login_error", None)
+    else:
+        st.session_state.login_error = "User ID or password is not correct."
+
+
+def sign_in_form():
+    sign_in(st.session_state.get("login_uid", ""), st.session_state.get("login_pw", ""))
 
 
 def login_page():
-    st.markdown(CSS, unsafe_allow_html=True)
-    st.markdown("<style>[data-testid='stSidebar']{display:none}</style>", unsafe_allow_html=True)
-    left, right = st.columns([1.25, 1], gap="large")
-    with left:
-        st.image(str(APP / "assets" / "logo.svg"), width=380)
-        st.markdown(
-            "<div class='ps-banner' style='margin-top:10px'><h1>Find land for farming – faster, with reasons</h1>"
-            "<div class='sub'>A decision-support portal for Agriculture & Horticulture departments, district administration "
-            "and planners in Assam. It shows where unused land is, how suitable it is, and why.</div>"
-            f"<div class='chips'><span class='ps-chip'>🗺️ {len(DISTRICTS)} districts</span><span class='ps-chip'>🛰️ 9 satellite & open data layers</span>"
-            "<span class='ps-chip'>📐 30 m detail</span><span class='ps-chip'>📍 site, block & circle ranking</span>"
-            "<span class='ps-chip'>⬇️ Excel · Google Earth · GIS downloads</span></div></div>", unsafe_allow_html=True)
-        c = st.columns(3)
-        for col, (ic, t, d) in zip(c, [("🔍", "Find land", "Guided search in plain language – no GIS skills needed"),
-                                       ("🏆", "Rank blocks", "Where to place programme targets first"),
-                                       ("❓", "See why", "Every site explains its strengths and problems")]):
-            col.markdown(f"<div class='ps-tile'><div class='ic'>{ic}</div><div class='t'>{t}</div><div class='d'>{d}</div></div>",
-                         unsafe_allow_html=True)
-        st.caption("Districts: " + " · ".join(DNAME[d] for d in DISTRICTS))
-    with right:
-        st.markdown("### Sign in")
-        with st.container(border=True):
-            st.info(f"**Demo access for evaluators**  \nUser ID: `{DEMO_USER}`  \nPassword: `{DEMO_PASS}`")
-            if st.button("➡️ Enter with demo access", type="primary", use_container_width=True):
-                u = check(DEMO_USER, DEMO_PASS)
-                if u:
-                    sign_in(DEMO_USER, u)
-                st.error("Demo account not configured.")
-            st.markdown("<div style='text-align:center;color:#6b7280;margin:6px 0'>or sign in with your own account</div>",
-                        unsafe_allow_html=True)
-            with st.form("login"):
-                uid = st.text_input("User ID")
-                pw = st.text_input("Password", type="password")
-                ok = st.form_submit_button("Sign in", use_container_width=True)
-            if ok:
-                u = check(uid, pw)
-                if u:
-                    sign_in(uid.strip().lower(), u)
-                st.error("User ID or password is not correct.")
-        st.caption("Prototype for NESFIC 2026 · Challenge D13 (DST Assam – ASSAC). Built on free, open data. "
-                   "Production version: department log-ins with roles and an audit log.")
+    # One top-level block: after sign-in the first element of the portal replaces it whole,
+    # so no leftover sign-in boxes linger on screen while the portal loads.
+    with st.container():
+        st.markdown(CSS, unsafe_allow_html=True)
+        st.markdown("<style>[data-testid='stSidebar']{display:none}</style>", unsafe_allow_html=True)
+        left, right = st.columns([1.25, 1], gap="large")
+        with left:
+            st.image(str(APP / "assets" / "logo.svg"), width=380)
+            st.markdown(
+                "<div class='ps-banner' style='margin-top:10px'><h1>Find land for farming – faster, with reasons</h1>"
+                "<div class='sub'>A decision-support portal for Agriculture & Horticulture departments, district administration "
+                "and planners in Assam. It shows where unused land is, how suitable it is, and why.</div>"
+                f"<div class='chips'><span class='ps-chip'>🗺️ {len(DISTRICTS)} districts</span><span class='ps-chip'>🛰️ 9 satellite & open data layers</span>"
+                "<span class='ps-chip'>📐 30 m detail</span><span class='ps-chip'>📍 site, block & circle ranking</span>"
+                "<span class='ps-chip'>⬇️ Excel · Google Earth · GIS downloads</span></div></div>", unsafe_allow_html=True)
+            c = st.columns(3)
+            for col, (ic, t, d) in zip(c, [("🔍", "Find land", "Guided search in plain language – no GIS skills needed"),
+                                           ("🏆", "Rank blocks", "Where to place programme targets first"),
+                                           ("❓", "See why", "Every site explains its strengths and problems")]):
+                col.markdown(f"<div class='ps-tile'><div class='ic'>{ic}</div><div class='t'>{t}</div><div class='d'>{d}</div></div>",
+                             unsafe_allow_html=True)
+            st.caption("Districts: " + " · ".join(DNAME[d] for d in DISTRICTS))
+        with right:
+            st.markdown("### Sign in")
+            with st.container(border=True):
+                st.info(f"**Demo access for evaluators**  \nUser ID: `{DEMO_USER}`  \nPassword: `{DEMO_PASS}`")
+                st.button("➡️ Enter with demo access", type="primary", use_container_width=True,
+                          on_click=sign_in, args=(DEMO_USER, DEMO_PASS))
+                st.markdown("<div style='text-align:center;color:#6b7280;margin:6px 0'>or sign in with your own account</div>",
+                            unsafe_allow_html=True)
+                with st.form("login"):
+                    st.text_input("User ID", key="login_uid")
+                    st.text_input("Password", type="password", key="login_pw")
+                    st.form_submit_button("Sign in", use_container_width=True, on_click=sign_in_form)
+                if st.session_state.get("login_error"):
+                    st.error(st.session_state.login_error)
+            st.caption("Prototype for NESFIC 2026 · Challenge D13 (DST Assam – ASSAC). Built on free, open data. "
+                       "Production version: department log-ins with roles and an audit log.")
 
 
 if "user" not in st.session_state:
@@ -105,9 +111,6 @@ pg = st.navigation({
 with st.sidebar:
     st.markdown("---")
     st.markdown(f"👤 **{st.session_state.user['name']}**")
-    if st.button("Sign out", use_container_width=True):
-        for k in list(st.session_state.keys()):
-            del st.session_state[k]
-        st.rerun()
+    st.button("Sign out", use_container_width=True, on_click=lambda: st.session_state.clear())
     st.caption("Prototype · NESFIC 2026 · D13")
 pg.run()

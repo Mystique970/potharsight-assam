@@ -1,30 +1,34 @@
-# D13 – Geospatial Identification of Cultivable & Fertile Agricultural Potential Land (Assam)
+# PotharSight Assam – Geospatial Identification of Cultivable & Fertile Agricultural Potential Land
 
-NESFIC 2026 · Challenge owner: DST Assam – ASSAC · Pilot districts: **Kamrup (Rural)** and **Cachar**
+NESFIC 2026 · Challenge D13 · Challenge owner: DST Assam – ASSAC ·
+Districts: **Kamrup (Rural)**, **Cachar**, **Lakhimpur** and **Dibrugarh** – the top four in Assam for vacant cultivable land (DES Assam 2020-21)
 
 A spatial decision-support layer that finds vacant / under-used land, checks whether it can be
 farmed, scores how suitable it is for a programme, explains **why**, and ranks patches, blocks and
 revenue circles. All inputs are free, open and need **no login**.
 
-## Quick start (Windows + Anaconda)
+## Portal
 
-1. Unzip this folder somewhere with ~5 GB free, e.g. `Documents\NESFIC_D13`.
-2. Double-click `setup_and_run_windows.bat` (or run the lines inside it in *Anaconda Prompt*).
-   - Creates a `d13` conda environment, installs packages, checks data access, runs both districts.
-   - First run downloads roughly 1–3 GB and takes 1–3 hours depending on your connection.
-3. Open the dashboard: `conda activate d13` then `streamlit run app\streamlit_app.py`.
-4. Zip the `outputs` folder and `pipeline.log` and share them back for validation and the Proof of Work PDF.
+A guided web portal for officials: pick a district, what to grow and the type of land, and get graded sites
+(A–D) on a map with reasons, block comparisons and downloads (Excel, Google Earth KML, GeoJSON). An advanced
+map page serves GIS staff. Demo access is shown on the sign-in page (user `evaluator`, password `pothar2026`).
 
-Manual equivalent:
 ```
-conda create -n d13 python=3.11 -y && conda activate d13
 pip install -r requirements.txt
-python check_access.py
-python run_all.py                       # both districts, all steps
+streamlit run app/streamlit_app.py
+```
+
+## Re-running the analysis (Windows, Python 3.10–3.12)
+
+```
+pip install -r requirements.txt
+python check_access.py                  # checks the open data sources are reachable
+python run_all.py                       # all districts in config.yaml, all steps
 python run_all.py --district cachar     # one district
 python run_all.py --steps fetch --only s1 soil   # retry specific layers
-python run_all.py --steps model         # re-run model after editing weights in config.yaml
+python run_all.py --steps prep model    # re-run the model after editing config.yaml
 ```
+The first full run downloads roughly 1–3 GB per district.
 
 ## How it works
 

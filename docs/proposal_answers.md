@@ -60,7 +60,7 @@ PotharSight Assam is a configurable geospatial pipeline plus a web dashboard.
 
 **User journey** (diagram in the Proof of Work PDF):
 0. The officer **signs in** to the PotharSight portal with a user ID and password.
-1. The officer selects a **district** (Kamrup Rural or Cachar in the pilot) and a **programme** (field crops or horticulture).
+1. The officer selects a **district** (Kamrup Rural, Cachar, Lakhimpur or Dibrugarh in the prototype) and a **programme** (field crops or horticulture).
 2. The **summary cards** show the priority land area, the number of patches, and the official vacant-cultivable figure next to the model figure.
 3. The **map** shows the suitability classes over a satellite basemap, block boundaries with their rank, and the priority patches.
 4. Clicking a **patch** shows its rank, area, land status, six factor scores and a plain-language reason.
@@ -69,9 +69,9 @@ PotharSight Assam is a configurable geospatial pipeline plus a web dashboard.
 7. **Download** the layers (GPKG, GeoJSON, SHP, GeoTIFF, CSV) for the field-verification team, Revenue Department checks and the department's own GIS.
 8. In Track B, field teams mark patches as verified or rejected, and this feedback re-trains the model.
 
-**Prototype maturity:** working end to end, not a mock-up. The pipeline has run on real data for both pilot districts and both programme profiles, producing:
-- pilot districts, for field crops: 3,624 priority sites covering 22,003 ha in Kamrup (Rural), and 4,261 sites covering 36,544 ha in Cachar;
-- scale-out districts, added with one configuration line each and no code change: 3,249 sites (12,612 ha) in Lakhimpur and 1,845 sites (9,921 ha) in Dibrugarh;
+**Prototype maturity:** working end to end, not a mock-up. The pipeline has run on real data for four districts – the top four in Assam for vacant cultivable land – and both programme profiles, producing:
+- for field crops: 3,624 priority sites covering 22,003 ha in Kamrup (Rural), 4,261 sites (36,544 ha) in Cachar, 3,249 sites (12,612 ha) in Lakhimpur and 1,845 sites (9,921 ha) in Dibrugarh;
+- proof of scalability: Lakhimpur and Dibrugarh were added with one configuration line each and no code change;
 - ranked block and circle tables;
 - validation reports;
 - a working Streamlit dashboard ⟨public URL – add after hosting⟩.
@@ -125,7 +125,7 @@ We work in short, evidence-driven iterations: **Plan → Verify data → Acquire
 |---|---|---|
 | 1. Discovery: challenge analysis, user needs, criteria from FAO, ICAR and SHC | Criteria table, workbook | Done |
 | 2. Data verification: every source tested for open, no-login access; data register | data_register.csv | Done |
-| 3. Pilot selection on evidence: DES LUS 2020-21 vacant-cultivable ranking | Kamrup (R) + Cachar | Done |
+| 3. District selection on evidence: DES LUS 2020-21 vacant-cultivable ranking | Kamrup (R), Cachar, Lakhimpur, Dibrugarh | Done |
 | 4. Automated acquisition: scripted download with fallbacks | 9 layers per district | Done |
 | 5. Processing: common grid, derived layers | Harmonised raster stack | Done |
 | 6. Model v1: availability, suitability, reasons, ranking | Maps, patches, rankings | Done |
@@ -152,7 +152,7 @@ The timeline is aligned with the NESFIC schedule: prototype development November
 | Jan 2027 | Model v3 | Crop-specific profiles (rice, mustard, pulses, citrus, banana, vegetables); ML fallow classifier | Training samples from ASSAC |
 | Feb 2027 | **Demo Day** | Hosted portal on 4 districts; field-verification module | — |
 | Feb–Mar 2027 | MVP | 4–6 districts; user log-in roles, audit log; GeoServer WMS/WFS | Server at ASSAC/SDC |
-| **Mar 2027** | **Ready for validation** | Field verification of a sample of patches in each pilot district by department staff | Field teams |
+| **Mar 2027** | **Ready for validation** | Field verification of a sample of patches in each of the four districts by department staff | Field teams |
 | Apr–May 2027 | Refinement | Accuracy report; model re-trained on feedback; statewide roll-out plan | Validation results |
 
 ---
@@ -173,7 +173,7 @@ The timeline is aligned with the NESFIC schedule: prototype development November
 | Optical | Sentinel-2 L2A, 2022–2024 | COG, 10 m (read at 20–40 m) | Seasonal NDVI, fallow, productivity |
 | Radar | Sentinel-1 GRD, monsoon 2022–2024 | COG, 10 m (read at 40 m) | Flood frequency |
 | Roads, towns, rivers, protected areas | OpenStreetMap | Vector | Access, water, exclusions |
-| Land use statistics 2020-21 | DES Assam | Table | Validation and pilot selection |
+| Land use statistics 2020-21 | DES Assam | Table | Validation and district selection |
 
 **Needed from departments for the pilot (not assumed; requested subject to policy):**
 - ASSAC: LULC (50K), wasteland atlas, and high-resolution imagery for verification.
@@ -321,7 +321,7 @@ Advisors we will seek: a soil scientist from AAU Jorhat or a KVK, and the ASSAC 
 | Boundary accuracy | Replace with LGD / Survey of India boundaries from ASSAC |
 
 **Pilot validation (after development):**
-1. In Kamrup (Rural) and Cachar, ASSAC and the District Agriculture Office select 3–4 blocks.
+1. In each of the four districts, ASSAC and the District Agriculture Office select 3–4 blocks.
 2. A stratified random sample of about 100 patches per district (S1, S2, S3 and rejected land) is verified by field staff using a mobile form. The checks cover the land's current use, whether it is vacant, any problems with soil or water, and its legal status from Revenue.
 3. We report precision and accuracy, then re-calibrate thresholds and weights and train the ML classifier on the verified points.
 4. Success criteria: at least 80 % of S1/S2 patches confirmed as cultivable and available, and officers confirming the tool shortens site selection.

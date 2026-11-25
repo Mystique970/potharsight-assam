@@ -2,7 +2,7 @@
 import pandas as pd
 import streamlit as st
 
-from theme import DISTRICTS, DNAME, OUT, PURPOSE, banner, footer
+from theme import DISTRICTS, DNAME, OUT, PURPOSE, banner, bars, footer
 
 banner("Compare districts & blocks", "Which blocks have the most suitable unused land – and what holds each one back?",
        ["🏆 Ranked by suitable area × quality", "🧭 Main problem per block", "⬇️ Download as Excel"])
@@ -29,8 +29,9 @@ A.insert(0, "Assam rank", range(1, len(A) + 1))
 
 st.markdown(f"#### Top {level.lower()} across all districts")
 top = A.head(15)
-st.bar_chart(top.set_index("name")[["Best land (ha)", "Good land (ha)"]], horizontal=True, height=420, sort=False,
-             color=["#0b6b2e", "#46b04a"])
+tb = top.assign(label=top.name + " (" + top.District + ")").set_index("label")[["Best land (ha)", "Good land (ha)"]]
+tb.index.name = level[:-1]
+bars(tb, ["#0b6b2e", "#46b04a"], horizontal=True, height=440)
 show = A[["Assam rank", "District", "name", "Best land (ha)", "Good land (ha)", "Unused land (ha)", "mean_score", "Main problem"]]
 show = show.rename(columns={"name": level[:-1], "mean_score": "Average score"})
 st.dataframe(show.round(0), hide_index=True, use_container_width=True, height=420)
@@ -41,5 +42,6 @@ st.markdown("#### Main problems across districts")
 st.caption("Share of each district's unused land where this is the biggest weakness – tells departments which support to bundle "
            "(liming, irrigation, flood-tolerant seed, roads).")
 pv = A.groupby(["District", "Main problem"])["Unused land (ha)"].sum().unstack(fill_value=0)
-st.bar_chart(pv.div(pv.sum(1), axis=0) * 100, height=300)
+pv.index.name = "District"
+bars(pv.div(pv.sum(1), axis=0) * 100, ["#8c510a", "#2166ac", "#5aae61", "#f4a582", "#9970ab", "#bababa"], height=320, unit="of unused land", pct=True)
 footer()

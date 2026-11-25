@@ -76,7 +76,7 @@ H.append(f"""<div class="page cover">
 <div class="small">NESFIC 2026 · Stream 1 · Challenge D13 · Department of Science & Technology, Government of Assam – ASSAC</div>
 <h1>PotharSight Assam</h1>
 <div class="sub">Geospatial identification and prioritisation of cultivable & fertile agricultural potential land<br>
-<b>Proof of Work</b> – working prototype on real data: pilot districts Kamrup (Rural) and Cachar{(", plus scale-out run for " + ", ".join(names[d] for d in DIST if d not in PILOT) + " (config entry only, no code change)") if any(d not in PILOT for d in DIST) else ""}</div><br>
+<b>Proof of Work</b> – working prototype on real data: {len(DIST)} districts – {", ".join(names[d] for d in DIST[:-1])} and {names[DIST[-1]]}, the top {len(DIST)} in Assam for vacant cultivable land</div><br>
 <span class="tag">Suitability maps</span><span class="tag">Parcel (patch) & block prioritisation</span>
 <span class="tag">Reasons for every result</span><span class="tag">Downloadable GIS layers</span><span class="tag">Decision-support dashboard</span>
 <span class="tag">100 % free, open data</span><span class="tag">New district = one config line</span>
@@ -139,17 +139,19 @@ Runs on a laptop per district; configuration (districts, thresholds, weights, pr
 <tr><td>Soil pH, SOC, N, CEC, clay (0–30 cm)</td><td>ISRIC SoilGrids 2.0</td><td>250 m</td><td>Soil fertility</td></tr>
 <tr><td>Roads, towns, rivers, protected areas</td><td>OpenStreetMap</td><td>vector</td><td>Access, water, exclusions</td></tr>
 <tr><td>Districts, revenue circles, blocks</td><td>geoBoundaries (LGD-based)</td><td>vector</td><td>AOI and ranking units</td></tr>
-<tr><td>Land Utilisation Statistics 2020-21</td><td>DES Assam</td><td>district table</td><td>Pilot selection, validation</td></tr></table>""")
+<tr><td>Land Utilisation Statistics 2020-21</td><td>DES Assam</td><td>district table</td><td>District selection, validation</td></tr></table>""")
 H.append("""<h3>Department data that plugs in for the pilot (requested, not assumed)</h3>
 <ul><li>ASSAC: LULC 1:50K, wasteland atlas, high-resolution imagery → replace land-cover and verification layers</li>
 <li>Agriculture: Soil Health Card points → calibrate the soil factor · ASDMA: flood hazard zones → flood factor</li>
 <li>Revenue: cadastral parcels → patches become parcels; ownership filter · LGD / Survey of India boundaries</li></ul>
-<h3>Why Kamrup (Rural) and Cachar</h3><table class="t"><tr><th>Rank</th><th>District</th><th>Culturable waste</th><th>Current fallow</th><th>Other fallow</th><th>Vacant cultivable (ha)</th></tr>
+<h3>Why these four districts</h3><table class="t"><tr><th>Rank</th><th>District</th><th>Culturable waste</th><th>Current fallow</th><th>Other fallow</th><th>Vacant cultivable (ha)</th></tr>
 <tr><td>1</td><td><b>Kamrup (R)</b></td><td>16,231</td><td>7,688</td><td>7,534</td><td><b>31,453</b></td></tr>
 <tr><td>2</td><td><b>Cachar</b></td><td>19,165</td><td>2,706</td><td>4,193</td><td><b>26,064</b></td></tr>
-<tr><td>3</td><td>Lakhimpur</td><td>8,670</td><td>7,463</td><td>6,929</td><td>23,062</td></tr></table>
-<p class="small">Source: DES Assam Land Utilisation Statistics 2020-21. The two largest pools of vacant cultivable land, full statistics for
-validation, and contrasting landscapes (Brahmaputra valley with char land vs Barak valley with high rainfall and hills).</p></div>""")
+<tr><td>3</td><td><b>Lakhimpur</b></td><td>8,670</td><td>7,463</td><td>6,929</td><td><b>23,062</b></td></tr>
+<tr><td>4</td><td><b>Dibrugarh</b></td><td>11,064</td><td>6,828</td><td>4,654</td><td><b>22,546</b></td></tr>
+<tr><td>5</td><td>Barpeta</td><td>6,503</td><td>9,603</td><td>5,240</td><td>21,346</td></tr></table>
+<p class="small">Source: DES Assam Land Utilisation Statistics 2020-21. The four largest pools of vacant cultivable land, full statistics for
+validation, and contrasting landscapes: lower Brahmaputra valley with char land (Kamrup), Barak valley with high rainfall and hills (Cachar), and the flood-prone north bank and upper Assam tea belt (Lakhimpur, Dibrugarh). Lakhimpur and Dibrugarh were added after the first two with one config entry each and no code change.</p></div>""")
 
 # ---------------------------------------------------------------- 3 criteria
 fc, ho = cfg["profiles"]["field_crops"], cfg["profiles"]["horticulture"]
@@ -185,7 +187,7 @@ for i, d in enumerate(DIST):
     vh = val(d, "horticulture") if (OUT / d / "horticulture").exists() else None
     bl = pd.read_csv(P / "tables" / "blocks_ranking.csv")
     pp = pd.read_csv(P / "tables" / "priority_patches.csv")
-    H.append(f"<div class='page'><h2>4.{i + 1} · Results – {names[d]}{"" if d in PILOT else " (scale-out district)"}</h2><div class='kpi'>"
+    H.append(f"<div class='page'><h2>4.{i + 1} · Results – {names[d]}</h2><div class='kpi'>"
              f"<div class='k'><b>{v['model_vacant_plus_long_fallow_ha']:,} ha</b><span>vacant + long fallow (official {v['official_vacant_cultivable_ha']:,})</span></div>"
              f"<div class='k'><b>{v['model_all_candidate_incl_rabi_fallow_ha']:,} ha</b><span>all candidate land incl. rabi fallow</span></div>"
              f"<div class='k'><b>{pp.area_ha.sum():,.0f} ha</b><span>S1/S2 priority patches – field crops ({len(pp):,})</span></div>")
@@ -265,7 +267,7 @@ H.append("""<div class="page"><h2>8 · Scalability, roadmap and limitations</h2>
 <tr><td>Dec 2026</td><td>Criteria and weights workshop with ASSAC and agriculture/horticulture officers</td></tr>
 <tr><td>Dec 2026 – Jan 2027</td><td>Integrate ASSAC / department layers; crop-specific profiles; ML fallow classifier on verified samples</td></tr>
 <tr><td>Feb 2027 – Demo Day</td><td>Hosted dashboard, field-verification module</td></tr>
-<tr><td>Mar 2027 – ready for validation</td><td>Field verification of ~100 stratified patches per pilot district</td></tr>
+<tr><td>Mar 2027 – ready for validation</td><td>Field verification of ~100 stratified patches in each of the four districts</td></tr>
 <tr><td>Apr – May 2027 (MVP)</td><td>Accuracy report, re-calibration, 4–6 districts, user roles and audit log</td></tr></table>
 <h3>Limitations stated openly</h3><ul>
 <li>Soil is modelled (SoilGrids, 250 m), not field-tested – a screening layer until Soil Health Card / NBSS&LUP data are shared.</li>

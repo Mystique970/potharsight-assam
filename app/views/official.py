@@ -3,11 +3,12 @@ import os
 import tempfile
 
 import folium
+import geopandas as gpd
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
-from theme import (DESC, DISTRICTS, DNAME, GRADES, LAND_TYPE, PURPOSE, advice, banner, factor_bars_html, footer,
+from theme import (DESC, DISTRICTS, DNAME, GRADES, LAND_TYPE, PURPOSE, advice, banner, bars, factor_bars_html, footer,
                    legend_html, load_patches, reasons, validation)
 
 ss = st.session_state
@@ -34,15 +35,70 @@ def to_kml(gdf) -> bytes:
         return open(p, "rb").read()
 
 
+@st.cache_data(show_spinner=False, max_entries=32)
+def select_sites(d, prof, types, block, min_ha, grades):
+    patches, _ = load_patches(d, prof)
+    sel = patches[patches.land_status.isin(types) & (patches.area_ha >= min_ha) & patches.grade.isin(grades)]
+    if block != "All blocks":
+        sel = sel[sel.block == block]
+    sel = sel.sort_values("priority", ascending=False).reset_index(drop=True)
+    sel["site_no"] = range(1, len(sel) + 1)
+    return sel
+
+
+@st.cache_data(show_spinner="Drawing the map…", max_entries=32)
+def site_map(d, prof, types, block, min_ha, grades):
+    """All selected sites in two layers (outlines + dots) – fast even with 4,000 sites, every grade colour shown."""
+    import shapely
+    sel = select_sites(d, prof, types, block, min_ha, grades)
+    _, blocks = load_patches(d, prof)
+    b = sel.total_bounds
+    fm = folium.Map(location=[(b[1] + b[3]) / 2, (b[0] + b[2]) / 2], zoom_start=10, tiles=None, prefer_canvas=True)
+    fm.fit_bounds([[b[1], b[0]], [b[3], b[2]]])
+    folium.TileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                     attr="Esri World Imagery", name="Satellite photo").add_to(fm)
+    folium.TileLayer("OpenStreetMap", name="Street map", show=False).add_to(fm)
+    bl = blocks if block == "All blocks" else blocks[blocks.name == block]
+    folium.GeoJson(bl[["name", "geometry"]], name="Blocks", style_function=lambda f: {"fill": False, "color": "#ffffff", "weight": 1.6},
+                   tooltip=folium.GeoJsonTooltip(["name"], aliases=["Block"])).add_to(fm)
+    s = sel.iloc[::-1].copy()  # best sites drawn last (on top)
+    s["tip"] = [f"Site {n}: Grade {g} · {gn}, {a:.1f} ha – click for details"
+                for n, g, gn, a in zip(s.site_no, s.grade, s.grade_name, s.area_ha)]
+    pops = []
+    for _, r in s.iterrows():
+        good, watch = reasons(r)
+        pops.append(f"<div style='min-width:260px'><b>Site {r.site_no}</b> · {r.block} block<br>"
+                    f"<span style='background:{r.grade_col};color:#fff;padding:1px 6px;border-radius:6px'>Grade {r.grade} · {r.grade_name}</span> "
+                    f"{r.area_ha:.1f} ha<br>{LAND_TYPE[int(r.land_status)][1]} · better than {100 * r.pct_rank:.0f}% of sites in the district<br>"
+                    + (f"✅ {', '.join(good)}<br>" if good else "") + "".join(f"⚠️ {w}<br>" for w in watch)
+                    + f"💡 {advice(r, prof)}<br><a href='https://www.google.com/maps?q={r.lat},{r.lon}' target='_blank'>Open in Google Maps</a></div>")
+    s["popup"] = pops
+    s["col"] = s.grade_col
+    s["r"] = [7 if n <= 20 else 4.5 for n in s.site_no]
+    poly = s[["tip", "col", "geometry"]].copy()
+    poly["geometry"] = shapely.set_precision(poly.geometry.simplify(0.0003).values, 1e-5)
+    folium.GeoJson(poly, name="Site outlines", tooltip=folium.GeoJsonTooltip(["tip"], labels=False),
+                   style_function=lambda f: {"color": "#ffffff", "weight": 0.6, "fillColor": f["properties"]["col"], "fillOpacity": 0.85}
+                   ).add_to(fm)
+    pts = gpd.GeoDataFrame(s[["tip", "popup", "col", "r"]].copy(), geometry=gpd.points_from_xy(s.lon, s.lat), crs=4326)
+    folium.GeoJson(pts, name="Site dots", marker=folium.CircleMarker(radius=4.5, weight=1.2, fill=True, fill_opacity=1),
+                   style_function=lambda f: {"color": "#ffffff", "fillColor": f["properties"]["col"], "radius": f["properties"]["r"]},
+                   tooltip=folium.GeoJsonTooltip(["tip"], labels=False),
+                   popup=folium.GeoJsonPopup(["popup"], labels=False, max_width=360)).add_to(fm)
+    folium.LayerControl().add_to(fm)
+    return fm.get_root().render()
+
+
 if ss.step == 1:
     st.markdown("### Which district are you planning for?")
     cols = st.columns(len(DISTRICTS))
     for col, d in zip(cols, DISTRICTS):
         v = validation(d)
-        with col.container(border=True):
+        with col.container(border=True, height="stretch"):
             st.markdown(f"#### 📍 {DNAME[d]}")
             st.caption(DESC.get(d, ""))
             st.markdown(f"Official unused cultivable land:  \n**{v['official_vacant_cultivable_ha']:,} ha**")
+            st.markdown("<div class='ps-card-end'></div>", unsafe_allow_html=True)
             if st.button("Choose", key=f"d_{d}", type="primary", use_container_width=True):
                 ss.district = d
                 go(2)
@@ -51,10 +107,11 @@ elif ss.step == 2:
     st.markdown(f"### What do you want to grow in {DNAME[ss.district]}?")
     cols = st.columns(len(PURPOSE))
     for col, (k, (ic, lab, desc)) in zip(cols, PURPOSE.items()):
-        with col.container(border=True):
+        with col.container(border=True, height="stretch"):
             st.markdown(f"<div style='font-size:2.6rem'>{ic}</div>", unsafe_allow_html=True)
             st.markdown(f"#### {lab}")
             st.write(desc)
+            st.markdown("<div class='ps-card-end'></div>", unsafe_allow_html=True)
             if st.button(f"Select {lab}", key=f"p_{k}", type="primary", use_container_width=True):
                 ss.purpose = k
                 go(3)
@@ -67,7 +124,7 @@ elif ss.step == 3:
     cols = st.columns(3)
     picked = []
     for col, (k, (ic, lab, desc)) in zip(cols, LAND_TYPE.items()):
-        with col.container(border=True):
+        with col.container(border=True, height="stretch"):
             n = int((patches.land_status == k).sum())
             if st.checkbox(f"{ic} **{lab}**", value=k in ss.get("types", [1, 2, 3]), key=f"t_{k}"):
                 picked.append(k)
@@ -89,12 +146,9 @@ elif ss.step == 3:
 else:
     d, prof = ss.district, ss.purpose
     patches, blocks = load_patches(d, prof)
-    gl = [g.split(" · ")[0] for g in ss.get("grades", [f"{g} · {n}" for _, g, n, _ in GRADES])]
-    sel = patches[patches.land_status.isin(ss.types) & (patches.area_ha >= ss.min_ha) & patches.grade.isin(gl)]
-    if ss.block != "All blocks":
-        sel = sel[sel.block == ss.block]
-    sel = sel.sort_values("priority", ascending=False).reset_index(drop=True)
-    sel["site_no"] = range(1, len(sel) + 1)
+    gl = tuple(g.split(" · ")[0] for g in ss.get("grades", [f"{g} · {n}" for _, g, n, _ in GRADES]))
+    key = (d, prof, tuple(ss.types), ss.block, ss.min_ha, gl)
+    sel = select_sites(*key)
     where = ss.block + " block" if ss.block != "All blocks" else DNAME[d]
     ic, plab, _ = PURPOSE[prof]
 
@@ -106,42 +160,18 @@ else:
         st.warning("No sites match. Try a smaller minimum size, another block, or more land types / grades.")
         st.stop()
 
-    m = st.columns(5)
+    m = st.columns(6)
     m[0].metric("Sites found", f"{len(sel):,}")
     m[1].metric("Total area", f"{sel.area_ha.sum():,.0f} ha")
-    for i, (_, g, n, col) in enumerate(GRADES[:3]):
+    for i, (_, g, n, col) in enumerate(GRADES):
         m[2 + i].metric(f"Grade {g} · {n}", f"{sel.loc[sel.grade == g, 'area_ha'].sum():,.0f} ha")
     st.markdown(legend_html(), unsafe_allow_html=True)
 
     tab_map, tab_list, tab_blocks = st.tabs(["🗺️ Map of sites", "📋 Best sites, with reasons", "🏘️ Compare blocks"])
     with tab_map:
-        show = sel.head(400)
-        b = show.total_bounds
-        fm = folium.Map(location=[(b[1] + b[3]) / 2, (b[0] + b[2]) / 2], zoom_start=10, tiles=None)
-        fm.fit_bounds([[b[1], b[0]], [b[3], b[2]]])
-        folium.TileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-                         attr="Esri World Imagery", name="Satellite photo").add_to(fm)
-        folium.TileLayer("OpenStreetMap", name="Street map", show=False).add_to(fm)
-        bl = blocks if ss.block == "All blocks" else blocks[blocks.name == ss.block]
-        folium.GeoJson(bl[["name", "geometry"]], name="Blocks", style_function=lambda f: {"fill": False, "color": "#ffffff", "weight": 1.6},
-                       tooltip=folium.GeoJsonTooltip(["name"], aliases=["Block"])).add_to(fm)
-        for _, r in show.iloc[::-1].iterrows():  # best sites drawn last (on top)
-            good, watch = reasons(r)
-            html = (f"<b>Site {r.site_no}</b> · {r.block} block<br>"
-                    f"<span style='background:{r.grade_col};color:#fff;padding:1px 6px;border-radius:6px'>Grade {r.grade} · {r.grade_name}</span> "
-                    f"{r.area_ha:.1f} ha<br>{LAND_TYPE[int(r.land_status)][1]} · better than {100 * r.pct_rank:.0f}% of sites in the district<br>"
-                    + (f"✅ {', '.join(good)}<br>" if good else "") + "".join(f"⚠️ {w}<br>" for w in watch)
-                    + f"💡 {advice(r, prof)}<br><a href='https://www.google.com/maps?q={r.lat},{r.lon}' target='_blank'>Open in Google Maps</a>")
-            folium.GeoJson(r.geometry.simplify(0.0001).__geo_interface__,
-                           style_function=lambda f, c=r.grade_col: {"color": "#ffffff", "weight": 0.8, "fillColor": c, "fillOpacity": 0.9},
-                           tooltip=f"Site {r.site_no}: Grade {r.grade}, {r.area_ha:.1f} ha").add_to(fm)
-            folium.CircleMarker([r.lat, r.lon], radius=7 if r.site_no <= 20 else 4.5, color="#ffffff", weight=1.3, fill=True,
-                                fill_color=r.grade_col, fill_opacity=1,
-                                tooltip=f"Site {r.site_no}: Grade {r.grade} · {r.grade_name}, {r.area_ha:.1f} ha – click",
-                                popup=folium.Popup(html, max_width=340)).add_to(fm)
-        folium.LayerControl().add_to(fm)
-        components.html(fm.get_root().render(), height=600)
-        st.caption(f"Showing the best {len(show):,} of {len(sel):,} sites (the top 20 have bigger dots). Click a dot for details.")
+        components.html(site_map(*key), height=600)
+        st.caption(f"All {len(sel):,} sites, coloured by grade (the top 20 have bigger dots). Zoom in to see site outlines; "
+                   "click a dot for details. Use the layer button (top right) to switch to a street map.")
 
     with tab_list:
         n = st.select_slider("Sites to show", [10, 25, 50, 100], value=10)
@@ -170,8 +200,9 @@ else:
         g = g[g.index != "outside block layer"]
         g["total"] = g.sum(1)
         g = g.sort_values("total", ascending=False)
-        st.bar_chart(g.head(12)[[x[1] for x in GRADES]].rename(columns={x[1]: f"Grade {x[1]} · {x[2]}" for x in GRADES}),
-                     horizontal=True, height=380, color=[x[3] for x in GRADES], sort=False)
+        top = g.head(12)[[x[1] for x in GRADES]].rename(columns={x[1]: f"Grade {x[1]} · {x[2]}" for x in GRADES})
+        top.index.name = "Block"
+        bars(top, [x[3] for x in GRADES], horizontal=True, height=400)
         lim = blocks.set_index("name")["main_limitation"].to_dict()
         plain = {"soil fertility": "🧪 soil needs improvement", "flood safety": "🌊 flooding", "water availability": "💧 water is far",
                  "gentle terrain": "⛰️ slopes", "vegetation productivity": "🌿 weak vegetation", "road/market access": "🛣️ far from roads"}

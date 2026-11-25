@@ -1,4 +1,4 @@
-# Pilot district selection
+# District selection
 
 Open satellite, soil, terrain and rainfall data cover every Assam district equally, so we chose on
 (1) official evidence of unused cultivable land, (2) complete statistics for validation,
@@ -16,11 +16,13 @@ culturable waste + current fallows + other fallows.
 | 5 | Barpeta | 228,200 | 6,503 | 9,603 | 5,240 | 21,346 | 9.4 |
 | 6 | Dhemaji | 323,700 | 15,161 | 1,582 | 2,025 | 18,768 | 5.8 |
 
-Why Kamrup (R) and Cachar:
-- Largest and second-largest vacant cultivable land in the state.
+Why these four districts (ranks 1–4):
+- The four largest pools of vacant cultivable land in the state.
 - Full land-use statistics reported (Karbi Anglong, West Karbi Anglong and Dima Hasao report none).
-- Boundary layers available: Kamrup 11 revenue circles / 14 blocks; Cachar 5 circles / 15 blocks (geoBoundaries ADM3/ADM4).
+- Boundary layers available for revenue circles and blocks (geoBoundaries ADM3/ADM4).
 - Not affected by the December 2022 district mergers (Biswanath, Hojai, Bajali, Tamulpur).
-- Contrasting settings: Brahmaputra valley with char lands and Meghalaya foothills (Kamrup) vs Barak valley with
-  high rainfall, hills and tea estates (Cachar). A method that works in both is credible statewide.
-- Kamrup is next to Guwahati (ASSAC), making a department-run field pilot easy to organise.
+- Contrasting settings: lower Brahmaputra valley with char lands and Meghalaya foothills (Kamrup), Barak valley with
+  high rainfall, hills and tea estates (Cachar), the flood-prone north bank below the Arunachal foothills (Lakhimpur)
+  and the upper Assam tea and paddy belt (Dibrugarh). A method that works in all four is credible statewide.
+- Kamrup and Cachar were run first; Lakhimpur and Dibrugarh were added with one config entry each and no code change.
+- Kamrup is next to Guwahati (ASSAC), making a department-run field check easy to organise.

@@ -61,7 +61,7 @@ with t3:
         v = validation(d)
         q = ROOT / "data" / "interim" / d / "flood_qa.json"
         fq = json.loads(q.read_text()) if q.exists() else {}
-        rows.append([DNAME[d] + ("" if d in PILOT else " (scale-out)"), f"{v['model_vacant_plus_long_fallow_ha']:,} / {v['official_vacant_cultivable_ha']:,} ha",
+        rows.append([DNAME[d], f"{v['model_vacant_plus_long_fallow_ha']:,} / {v['official_vacant_cultivable_ha']:,} ha",
                      v["ratio_model_to_official"], f"{100 * v['active_farmland_share_scoring_S1_S2']:.0f} %",
                      v["sensitivity_min_rho"], "Sentinel-1 radar" if fq.get("s1_used") else "JRC / Esri water history (radar failed QA or not used)"])
     st.dataframe(pd.DataFrame(rows, columns=["District", "Satellite vs official unused land", "Ratio",
@@ -94,7 +94,7 @@ with t4:
 """)
     extra = [DNAME[d] for d in DISTRICTS if d not in PILOT]
     if extra:
-        st.success(f"Demonstrated: {', '.join(extra)} were added after the pilots with one configuration line each and the same code.")
+        st.success(f"Demonstrated: {', '.join(extra)} were added after the first two districts with one configuration line each – same code, no changes.")
     st.markdown("**Limitations stated openly:** soil is modelled at 250 m, not field-tested · 'unused' means satellite-observed, "
                 "ownership must be checked by the Revenue Department · sites are a parcel proxy until cadastral maps are shared · "
                 "char land changes every year, so the model is re-run each season.")

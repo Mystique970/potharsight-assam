@@ -131,10 +131,10 @@ header[data-testid="stHeader"] {height: 2.4rem; background: transparent;}
 .ps-chip {display: inline-block; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.35);
   color: #fff; border-radius: 999px; padding: 2px 10px; margin: 2px 6px 2px 0; font-size: 0.8rem;}
 .ps-kpi {background: #fff; border: 1px solid #e3ece3; border-left: 6px solid #2f9e44; border-radius: 10px;
-  padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 100%;}
+  padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 100%; min-height: 104px; box-sizing: border-box;}
 .ps-kpi .v {font-size: 1.6rem; font-weight: 700; color: #0b4d24; line-height: 1.2;}
 .ps-kpi .l {font-size: 0.83rem; color: #4b5563;}
-.ps-tile {background: #fff; border: 1px solid #dfe9df; border-radius: 12px; padding: 14px 16px; height: 100%;
+.ps-tile {background: #fff; border: 1px solid #dfe9df; border-radius: 12px; padding: 14px 16px; height: 100%; min-height: 168px; box-sizing: border-box;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);}
 .ps-tile .ic {font-size: 1.8rem;} .ps-tile .t {font-weight: 700; font-size: 1.05rem; color: #0b4d24;}
 .ps-tile .d {font-size: 0.88rem; color: #4b5563; margin-top: 3px;}
@@ -147,6 +147,14 @@ header[data-testid="stHeader"] {height: 2.4rem; background: transparent;}
 .fbt {background: #eef0ee; border-radius: 4px; height: 8px; overflow: hidden;} .fbt div {height: 8px; border-radius: 4px;}
 .fbv {font-weight: 700; font-size: 0.78rem;}
 .ps-legend span {display: inline-block; width: 13px; height: 13px; border-radius: 3px; margin: 0 5px -2px 12px;}
+/* equal-height cards in a row: columns stretch to the tallest, cards fill their column */
+[data-testid="stColumn"] > [data-testid="stVerticalBlock"] {height: 100%;}
+[data-testid="stElementContainer"]:has(.ps-tile), [data-testid="stElementContainer"]:has(.ps-kpi) {flex: 1 1 auto;}
+[data-testid="stElementContainer"]:has(.ps-tile) *:has(.ps-tile), [data-testid="stElementContainer"]:has(.ps-kpi) *:has(.ps-kpi) {height: 100%;}
+.ps-card-end {margin-top: auto;}
+[class*="st-key-dcard_"] [data-testid="stImage"] img {height: 300px; width: 100%; object-fit: contain;}
+[data-testid="stMetricValue"] > div {font-size: 1.75rem; overflow: visible; text-overflow: clip;}
+[data-testid="stElementContainer"]:has(.ps-card-end) {margin-top: auto;}
 .ps-foot {color: #6b7280; font-size: 0.78rem; margin-top: 18px; border-top: 1px solid #e5e7eb; padding-top: 8px;}
 </style>
 """
@@ -173,3 +181,32 @@ def footer():
 def legend_html():
     return "<div class='ps-legend'>" + "".join(
         f"<span style='background:{c}'></span>{g} · {n}" for _, g, n, c in GRADES) + "</div>"
+
+
+def bars(wide, colors, horizontal=False, stack=True, height=320, unit="hectares", pct=False):
+    """Bar chart with a full, untruncated legend under the chart; keeps the row and series order of `wide`."""
+    import altair as alt
+    cat = wide.index.name or "item"
+    w = wide.copy()
+    w.index.name = cat
+    series = [str(c) for c in w.columns]
+    w.columns = series
+    long = w.reset_index().melt(id_vars=cat, var_name="Series", value_name="value")
+    long["order"] = long.Series.map({s: i for i, s in enumerate(series)})
+    fmt = ".0f" if pct else ",.0f"
+    val = alt.X if horizontal else alt.Y
+    key = alt.Y if horizontal else alt.X
+    v = val("value:Q", title=("% " if pct else "") + unit, stack="zero" if stack else None, axis=alt.Axis(format=",.0f"))
+    k = key(f"{cat}:N", sort=list(w.index), title=None, axis=alt.Axis(labelAngle=0, labelLimit=260, labelOverlap=False))
+    enc = dict(color=alt.Color("Series:N", sort=series, scale=alt.Scale(domain=series, range=list(colors)[:len(series)]),
+                               legend=alt.Legend(orient="bottom", title=None, labelLimit=0, symbolType="square",
+                                                 direction="horizontal", columns=min(len(series), 4), offset=6)),
+               order=alt.Order("order:Q"),
+               tooltip=[alt.Tooltip(f"{cat}:N", title=cat.title()), alt.Tooltip("Series:N", title=" "),
+                        alt.Tooltip("value:Q", title="%" if pct else unit, format=fmt)])
+    if not stack:
+        enc["yOffset" if horizontal else "xOffset"] = alt.YOffset("Series:N", sort=series) if horizontal else alt.XOffset("Series:N", sort=series)
+    ch = alt.Chart(long).mark_bar(cornerRadiusEnd=2).encode(x=v if horizontal else k, y=k if horizontal else v, **enc)
+    if horizontal:
+        height = max(height, 30 * len(w))
+    st.altair_chart(ch.properties(height=height), use_container_width=True)

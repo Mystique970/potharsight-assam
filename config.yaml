@@ -15,7 +15,7 @@ boundaries:
   blocks:    "data/boundaries/assam_blocks.gpkg"      # geoBoundaries ADM4 (development blocks)
   name_field: "name"
 
-# Pilot districts (chosen on official vacant-cultivable land, DES Assam LUS 2020-21)
+# Prototype districts: the top 4 in Assam for official vacant cultivable land (DES Assam LUS 2020-21)
 districts:
   kamrup:
     boundary_name: "Kamrup"          # = Kamrup (Rural)
@@ -23,7 +23,7 @@ districts:
   cachar:
     boundary_name: "Cachar"
     official_vacant_cultivable_ha: 26064
-  # Scale-out districts (ranks 3 and 4 in DES LUS 2020-21; boundaries unchanged by the 2022 mergers)
+  # Ranks 3 and 4 – added later with one entry each, no code change (boundaries unchanged by the 2022 mergers)
   lakhimpur:
     boundary_name: "Lakhimpur"
     official_vacant_cultivable_ha: 23062
@@ -41,7 +41,7 @@ sources:
   worldcover_tile: "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N{lat:02d}E{lon:03d}_Map.tif"
   cop_dem_tile: "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N{lat:02d}_00_E{lon:03d}_00_DEM/Copernicus_DSM_COG_10_N{lat:02d}_00_E{lon:03d}_00_DEM.tif"
   esri_lulc_tile: "https://lulctimeseries.blob.core.windows.net/lulctimeseriesv003/lc{year}/{zone}_{year}0101-{y1}0101.tif"
-  esri_lulc_zones: ["46R"]   # MGRS zones covering the pilot districts
+  esri_lulc_zones: ["46R"]   # MGRS zones covering the districts
   jrc_tile: "https://storage.googleapis.com/global-surface-water/downloads2021/occurrence/occurrence_{lon}E_{lat}Nv1_4_2021.tif"
   overpass:
     - "https://overpass-api.de/api/interpreter"

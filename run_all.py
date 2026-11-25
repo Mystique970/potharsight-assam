@@ -1,7 +1,7 @@
 """D13 pipeline runner.
 
 Examples
-  python run_all.py                                  # both pilot districts, all steps
+  python run_all.py                                  # all districts in config.yaml, all steps
   python run_all.py --district kamrup                # one district
   python run_all.py --district cachar --steps fetch --only dem soil
   python run_all.py --steps model                    # re-run model only (after editing weights)
