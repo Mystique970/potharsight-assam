@@ -17,5 +17,6 @@ Before recording:
 | 1:35–1:50 | Compare blocks | "Blocks are compared, so programme targets can go where the land actually is: Boko, Rampur and Goroimari come first." |
 | 1:50–2:00 | Download buttons | "The list downloads as Excel, as a Google Earth file, or for any GIS." |
 | 2:00–2:15 | New search → Cachar → Fruits & vegetables (then show Lakhimpur / Dibrugarh cards) | "The same works for fruits and vegetables, which need safer land from floods, and for every district: Cachar in the Barak valley, and Lakhimpur and Dibrugarh, which we added with one configuration line each." |
+| 2:15–2:25 | Sidebar: switch Language to অসমীয়া; show Home and a site card; switch back | "Every page also works in Assamese, and on a phone, so field officers can use it in the village." |
 | 2:15–2:40 | Advanced analysis page: suitability map, weight sliders, validation | "For ASSAC's GIS staff there is an advanced page: suitability classes, adjustable criteria, factor scores, validation against official statistics and downloadable GeoTIFF and GeoPackage layers. Everything is built from free satellite and open data." |
 | 2:40–2:50 | Back to the sign-in page or the map | "PotharSight supports decisions; ownership is always confirmed by the Revenue Department before any allotment. Thank you." |

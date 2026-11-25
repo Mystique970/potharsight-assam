@@ -11,6 +11,8 @@ import pandas as pd
 import yaml
 from PIL import Image
 
+from doc_style import CSS as DOC_CSS, FONTS, laptop, phones, to_pdf
+
 ROOT = Path(__file__).resolve().parents[1]
 POW = ROOT / "docs" / "pow"
 cfg = yaml.safe_load((ROOT / "config.yaml").read_text())
@@ -46,40 +48,28 @@ def flow(steps, cls="flow"):
     return f'<div class="{cls}">' + '<span class="arr">→</span>'.join(f'<div class="box">{s}</div>' for s in steps) + "</div>"
 
 
-css = """
-@page { size: A4; margin: 14mm 13mm; }
-body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10.2pt; color: #1d2a22; line-height: 1.38; }
-h1 { font-size: 24pt; color: #14532d; margin: 0 0 4px; } h2 { font-size: 15pt; color: #14532d; border-bottom: 2px solid #1a9850;
-padding-bottom: 3px; margin-top: 4px; page-break-after: avoid; } h3 { font-size: 11.5pt; color: #166534; margin: 10px 0 4px; page-break-after: avoid; }
-.page { page-break-after: always; } .cover { text-align: left; padding-top: 30mm; }
-.sub { font-size: 13pt; color: #374151; } .tag { display: inline-block; background: #dcfce7; color: #14532d; padding: 2px 8px;
-border-radius: 10px; margin: 2px 4px 2px 0; font-size: 9pt; }
-table.t { border-collapse: collapse; width: 100%; font-size: 8.6pt; margin: 4px 0 8px; } table.t th { background: #14532d; color: white;
-text-align: left; padding: 3px 5px; } table.t td { border-bottom: 1px solid #e5e7eb; padding: 2.5px 5px; }
-.flow { display: flex; align-items: center; flex-wrap: wrap; gap: 3px; margin: 6px 0 10px; } .box { border: 1.5px solid #1a9850;
-background: #f0fdf4; border-radius: 6px; padding: 5px 7px; font-size: 8.6pt; text-align: center; max-width: 118px; }
-.arr { color: #1a9850; font-weight: bold; font-size: 13pt; } .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 6px 0; } .k { background: #f0fdf4; border-left: 4px solid #1a9850;
-padding: 5px 8px; } .k b { display: block; font-size: 15pt; color: #14532d; } .k span { font-size: 8.4pt; color: #4b5563; }
-.note { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 6px 9px; font-size: 9pt; margin: 6px 0; }
-.reason { background: #eff6ff; border-left: 4px solid #2563eb; padding: 6px 9px; font-size: 9.2pt; } .small { font-size: 8.4pt; color: #4b5563; }
-ul { margin: 3px 0 6px 18px; padding: 0; } li { margin: 1px 0; } img { border: 1px solid #d1d5db; }
+css = DOC_CSS + """
+.cover { padding-top: 22mm; } .sub { font-size: 12pt; color: #5d6a62; margin: 6px 0 10px; }
+.tag { display: inline-block; background: #eef4ec; color: #1d6b3a; padding: 2px 9px; border-radius: 999px; margin: 2px 4px 2px 0; font-size: 8pt; font-weight: 600; }
+.reason { background: #f6f4ee; border: 1px solid #e4dfd2; border-radius: 12px; padding: 7px 10px; font-size: 8.8pt; }
+h2 { border-bottom: none; }
 """
 
-H = [f"<html><head><meta charset='utf-8'><title>PotharSight Assam – D13 Proof of Work</title><style>{css}</style></head><body>"]
+H = [f"<html><head><meta charset='utf-8'><title>PotharSight Assam – D13 Proof of Work</title>{FONTS}<style>{css}</style></head><body>"]
 
 # ---------------------------------------------------------------- cover
 tot = {d: val(d, "field_crops") for d in DIST}
 PILOT = ["kamrup", "cachar"]
 names = {d: cfg["districts"][d]["boundary_name"] + (" (Rural)" if d == "kamrup" else "") for d in DIST}
 H.append(f"""<div class="page cover">
-<div class="small">NESFIC 2026 · Stream 1 · Challenge D13 · Department of Science & Technology, Government of Assam – ASSAC</div>
-<h1>PotharSight Assam</h1>
+<div class="eyebrow"><i></i>NESFIC 2026 · Stream 1 · Challenge D13 · DST Assam – ASSAC</div>
+<h1 style="font-size:34pt;margin-top:14px">PotharSight Assam <span style="color:#1d6b3a;font-weight:700;font-size:20pt">পথাৰছাইট</span></h1>
 <div class="sub">Geospatial identification and prioritisation of cultivable & fertile agricultural potential land<br>
 <b>Proof of Work</b> – working prototype on real data: {len(DIST)} districts – {", ".join(names[d] for d in DIST[:-1])} and {names[DIST[-1]]}, the top {len(DIST)} in Assam for vacant cultivable land</div><br>
 <span class="tag">Suitability maps</span><span class="tag">Parcel (patch) & block prioritisation</span>
 <span class="tag">Reasons for every result</span><span class="tag">Downloadable GIS layers</span><span class="tag">Decision-support dashboard</span>
 <span class="tag">100 % free, open data</span><span class="tag">New district = one config line</span>
+<span class="tag">Web + mobile</span><span class="tag">English + অসমীয়া</span>
 <h3>Prototype at a glance</h3><div class="kpi">""")
 for d in DIST:
     pp = pd.read_csv(OUT / d / "field_crops" / "tables" / "priority_patches.csv")
@@ -90,8 +80,9 @@ H.append(f"""</div>
 <p><b>What it does.</b> PotharSight Assam combines satellite land cover, Sentinel-2 crop seasons, Sentinel-1 monsoon flooding, soil, terrain,
 rainfall, water and road access into one 30 m decision-support layer. It finds land that is <i>available</i> (vacant, long fallow or
 rabi fallow), scores how <i>suitable</i> it is for a programme, explains <i>why</i>, and ranks patches, blocks and revenue circles.</p>
-<p><b>Contents.</b> 1 Problem & user journey · 2 Architecture & data · 3 Suitability criteria · 4 District results ·
-6 Dashboard · 7 Validation evidence · 8 Scalability, roadmap & limitations</p>
+<p><b>Contents.</b> 1 Problem and workflow with screens · 2 Architecture and data · 3 Suitability criteria · 4 District results ·
+5 Portal screens: desktop, mobile and Assamese · 6 Validation evidence · 7 Scalability, roadmap and limitations.
+Formulas, worked example and the full data register are in the separate <b>Technical Annex</b>.</p>
 <p class="small">All maps and numbers in this document are produced by the prototype code (Python; outputs/ folder) from open data;
 nothing is mocked. Boundaries: geoBoundaries (LGD-based), not authoritative.</p></div>""")
 
@@ -107,14 +98,16 @@ H.append("<b>Today</b>" + flow(["Programme target", "Letters to offices for stat
                                "Field visits to many sites", "Weeks; criteria not recorded"]))
 H.append("<b>With PotharSight</b>" + flow(["Select district + programme", "See suitability map, ranked blocks & patches", "Read reasons; adjust weights",
                                          "Download shortlist (GPKG/SHP/CSV)", "Field + Revenue check only for shortlist", "Feedback improves model"]))
-H.append("""<h3>User journey in the dashboard</h3><table class="t"><tr><th>Step</th><th>User action</th><th>What the system shows</th></tr>
-<tr><td>1</td><td>Choose district and programme (field crops / horticulture)</td><td>Summary cards: priority land, patches, official vs satellite vacant land</td></tr>
-<tr><td>2</td><td>Explore the map</td><td>S1/S2/S3 suitability over satellite imagery, block boundaries with rank, priority patches</td></tr>
-<tr><td>3</td><td>Click a patch</td><td>Rank, area, land status, six factor scores and a plain-language reason</td></tr>
-<tr><td>4</td><td>Compare blocks / circles</td><td>Ranked tables: S1 and S2 hectares, mean score, main limitation</td></tr>
-<tr><td>5</td><td>Change criteria weights</td><td>Patches re-ranked live for the programme's priorities</td></tr>
-<tr><td>6</td><td>Download</td><td>GeoPackage, GeoJSON, Shapefile, GeoTIFF and CSV for field teams and the department GIS</td></tr>
-<tr><td>7</td><td>Verify (pilot)</td><td>Field and Revenue Department checks of shortlisted patches; results feed back into the model</td></tr></table>
+H.append("<h3>Workflow with screens (phone, 390 × 844)</h3><p>An officer gets from a district to a ranked, explained shortlist in four taps. "
+         "The same pages work on desktop and phone, in English or Assamese.</p>")
+H.append(phones([("mobile_0_login_signin.png", "<span class='step'>0</span> Sign in", "demo access shown for evaluators"),
+                 ("mobile_2_district.png", "<span class='step'>1</span> District", "official unused land shown"),
+                 ("mobile_3_purpose.png", "<span class='step'>2</span> What to grow", "field crops or fruits & vegetables"),
+                 ("mobile_4_land.png", "<span class='step'>3</span> Type of land", "block, size and grade filters"),
+                 ("mobile_5_results_map.png", "<span class='step'>4</span> Map of sites", "all sites coloured A–D"),
+                 ("mobile_6_results_list.png", "<span class='step'>5</span> Reasons", "6 factors, watch-outs, suggestion")], cols=6, maxpx=460))
+H.append("""<p class="small" style="margin-top:6px">After step 5 the officer downloads the shortlist (Excel, Google Earth KML or GeoJSON) for the field team and the
+circle office; field and Revenue checks feed back into the model in the pilot.</p>
 <div class="note"><b>Decision support, not decision-making:</b> "available" means vacant or under-used in satellite data. Ownership and legal
 status are always verified by the Revenue Department before any allocation.</div></div>""")
 
@@ -204,23 +197,36 @@ for i, d in enumerate(DIST):
              f"productivity {r0.f_productivity:.0f}, access {r0.f_access:.0f}</div>")
     H.append("</div>")
 
-# ---------------------------------------------------------------- 6 dashboard
-S = POW / "screens"
-H.append("<div class='page'><h2>6 · PotharSight web portal (working prototype)</h2>"
-         "<p>Sign-in (demo access for evaluators) → <b>Home</b> with all districts → <b>Find land for farming</b>: a guided, "
-         "jargon-free 3-step search for officials → results graded A–D with map, Google Maps links, 6-factor profile, strong points, "
-         "problems and a suggestion per site → Excel / Google Earth / GIS downloads. <b>Compare districts & blocks</b> ranks blocks "
-         "and circles across districts; <b>Advanced map analysis</b> serves GIS staff; <b>How it works</b> documents method and validation.</p>")
-H.append("<div class='grid2'>" + img(S / "portal_0_login.png", maxpx=900) + img(S / "portal_1_home.png", maxpx=900) + "</div>")
-H.append("<div class='grid2'>" + img(S / "portal_2_district.png", maxpx=900) + img(S / "portal_4_land.png", maxpx=900) + "</div></div>")
-H.append("<div class='page'><h2>6 · Portal results for an official</h2>" + img(S / "portal_5_results_map.png", maxpx=1400))
-H.append(img(S / "portal_6_results_list.png", maxpx=1400) + "</div>")
-H.append("<div class='page'><h2>6 · Rankings, advanced analysis and validation pages</h2><div class='grid2'>"
-         + img(S / "portal_8_rankings.png", maxpx=900) + img(S / "portal_9_analyst.png", maxpx=900) + "</div><div class='grid2'>"
-         + img(S / "portal_7_results_blocks.png", maxpx=900) + img(S / "portal_11_validation.png", maxpx=900) + "</div></div>")
+# ---------------------------------------------------------------- 5 portal screens
+H.append("<div class='page'><div class='eyebrow'><i></i>Live prototype</div><h2 style='margin-top:6px'>5 · Portal screens – desktop</h2>"
+         "<p>Clean, plain-language pages for officials; flat icons; English / Assamese switch on every page. Sign-in shows demo access for "
+         "evaluators. Captured at 1440 × 900.</p>"
+         + laptop("portal_0_login.png", "<b>Figure 5.1</b> Sign-in with public demo access, headline numbers and the language switch.", width="86%")
+         + laptop("portal_1_home.png", "<b>Figure 5.2</b> Home: totals for the four districts, one tile per task and one card per district.", width="86%")
+         + "</div>")
+H.append("<div class='page'><h2>5 · Portal screens – desktop (continued)</h2>"
+         + laptop("portal_5_results.png", "<b>Figure 5.3</b> Results for Cachar, field crops: area by grade A–D and the map of all sites, coloured by grade.", width="86%")
+         + laptop("portal_6_results_list.png", "<b>Figure 5.4</b> Best sites with reasons: six-factor profile, strong points, watch-outs, a site-specific "
+                  "suggestion and a Google Maps link.", width="86%") + "</div>")
+H.append("<div class='page'><h2>5 · Portal screens – desktop (continued)</h2><div class='grid2'>"
+         + "<div>" + laptop("portal_7_results_blocks.png", "<b>Figure 5.5</b> Compare blocks inside the search: area by grade and main problem.") + "</div>"
+         + "<div>" + laptop("portal_8_rankings.png", "<b>Figure 5.6</b> Cross-district block ranking with downloads.") + "</div>"
+         + "<div>" + laptop("portal_9_analyst.png", "<b>Figure 5.7</b> Advanced map analysis for GIS staff: S1–N classes, live weights, GIS exports.") + "</div>"
+         + "<div>" + laptop("portal_11_validation.png", "<b>Figure 5.8</b> How it works & validation: method, data, accuracy checks.") + "</div>"
+         + "</div><h3>Assamese (অসমীয়া)</h3><div class='grid2'>"
+         + "<div>" + laptop("as_1_home.png", "<b>Figure 5.9</b> Home in Assamese.") + "</div>"
+         + "<div>" + laptop("as_6_results_list.png", "<b>Figure 5.10</b> Site reasons and suggestions in Assamese.") + "</div></div></div>")
+H.append("<div class='page'><h2>5 · Portal screens – mobile</h2><p>The portal is responsive: on a phone the menu folds away, cards stack and numbers "
+         "sit two per row. Captured at 390 × 844 (a common Android / iPhone size).</p>"
+         + phones([("mobile_0_login.png", "Sign-in", "headline and numbers"), ("mobile_1_home.png", "Home", "tasks and districts"),
+                   ("mobile_2_district.png", "Step 1", "choose district"), ("mobile_5_results.png", "Results", "area by grade"),
+                   ("mobile_5_results_map.png", "Map", "all sites, A–D"), ("mobile_6_results_list.png", "Reasons", "per-site profile"),
+                   ("as_mobile_1_home.png", "অসমীয়া", "home in Assamese"), ("as_mobile_6_results_list.png", "অসমীয়া", "reasons in Assamese")],
+                  cols=4, maxpx=520)
+         + "<p class='cap'><b>Figure 5.11</b> Mobile screens of the prototype (English and Assamese).</p></div>")
 
 # ---------------------------------------------------------------- 7 validation
-H.append("<div class='page'><h2>7 · Validation evidence</h2><table class='t'><tr><th>Check</th>" +
+H.append("<div class='page'><h2>6 · Validation evidence</h2><table class='t'><tr><th>Check</th>" +
          "".join(f"<th>{names[d]} – field crops</th>" for d in DIST) + "<th>Interpretation</th></tr>")
 rows = [("Satellite vacant + long fallow vs DES 2020-21", lambda v: f"{v['model_vacant_plus_long_fallow_ha']:,} vs {v['official_vacant_cultivable_ha']:,} ha (ratio {v['ratio_model_to_official']})",
          "Same order of magnitude. Lower than DES because DES culturable waste includes scrub that satellite maps as tree cover, and current fallow varies by year."),
@@ -255,7 +261,7 @@ H.append("<p class='small'>Development testing: an automated synthetic end-to-en
          "fetch-status logs, a data register and a validation report on every run.</p></div>")
 
 # ---------------------------------------------------------------- 8 scalability, roadmap, limitations
-H.append("""<div class="page"><h2>8 · Scalability, roadmap and limitations</h2>
+H.append("""<div class="page"><h2>7 · Scalability, roadmap and limitations</h2>
 <h3>Replicable by configuration</h3><table class="t"><tr><th>To add…</th><th>Do this</th><th>Code change?</th></tr>
 <tr><td>A district in Assam</td><td>Add one entry under <code>districts</code> in config.yaml; <code>python run_all.py --district &lt;name&gt;</code></td><td>No</td></tr>
 <tr><td>Another state</td><td>Point <code>boundaries</code> to that state's district/block layers (all satellite sources are national/global)</td><td>No</td></tr>
@@ -263,7 +269,7 @@ H.append("""<div class="page"><h2>8 · Scalability, roadmap and limitations</h2>
 <tr><td>Department data</td><td>Replace a layer file (ASSAC LULC, Soil Health Card, ASDMA flood, cadastral parcels)</td><td>No</td></tr>
 <tr><td>Statewide service</td><td>Scheduled seasonal re-run on SDC/ASSAC server; GeoServer WMS/WFS</td><td>Deployment only</td></tr></table>
 <h3>Roadmap (NESFIC timeline)</h3><table class="t"><tr><th>When</th><th>Milestone</th></tr>
-<tr><td>Done (Nov 2026)</td><td>Two-district working prototype, dashboard, GIS exports, validation</td></tr>
+<tr><td>Done (Nov 2026)</td><td>Four-district working prototype; guided portal (web + mobile, English + Assamese); GIS exports; validation</td></tr>
 <tr><td>Dec 2026</td><td>Criteria and weights workshop with ASSAC and agriculture/horticulture officers</td></tr>
 <tr><td>Dec 2026 – Jan 2027</td><td>Integrate ASSAC / department layers; crop-specific profiles; ML fallow classifier on verified samples</td></tr>
 <tr><td>Feb 2027 – Demo Day</td><td>Hosted dashboard, field-verification module</td></tr>
@@ -283,9 +289,5 @@ POW.mkdir(parents=True, exist_ok=True)
 html = POW / "PotharSight_Assam_D13_Proof_of_Work.html"
 html.write_text("\n".join(H), encoding="utf-8")
 pdf = POW / "PotharSight_Assam_D13_Proof_of_Work.pdf"
-for exe in [r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe", r"C:\Program Files\Google\Chrome\Application\chrome.exe"]:
-    if Path(exe).exists():
-        subprocess.run([exe, "--headless", "--disable-gpu", "--no-pdf-header-footer", f"--print-to-pdf={pdf}", html.as_uri()],
-                       check=False, timeout=180)
-        break
+to_pdf(html, pdf)
 print(pdf, f"{pdf.stat().st_size / 1e6:.1f} MB" if pdf.exists() else "NOT CREATED")

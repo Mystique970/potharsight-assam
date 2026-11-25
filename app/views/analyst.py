@@ -26,11 +26,14 @@ if not available:
     st.error("No outputs found. Run `python run_all.py` first.")
     st.stop()
 
-from theme import banner  # noqa: E402
+from theme import banner, tr  # noqa: E402
 
-banner("🛠️ Advanced map analysis", "For GIS staff and planners: full suitability classes, adjustable criteria weights, "
-       "factor scores, block & circle rankings, validation and GIS downloads.",
-       ["S1 / S2 / S3 / N classes (FAO)", "Live weight sliders", "GeoTIFF · GeoPackage · Shapefile"])
+banner(tr("Advanced map analysis", "উন্নত মানচিত্ৰ বিশ্লেষণ"), tr("For GIS staff and planners: full suitability classes, adjustable criteria weights, "
+       "factor scores, block & circle rankings, validation and GIS downloads.", "GIS কৰ্মী আৰু পৰিকল্পনাকাৰীৰ বাবে: সম্পূৰ্ণ উপযুক্ততা শ্ৰেণী, সলনি কৰিব পৰা মাপকাঠি, কাৰক নম্বৰ, ব্লক আৰু চক্ৰৰ ক্ৰম, পৰীক্ষা আৰু GIS ডাউনলোড।"),
+       ["S1 / S2 / S3 / N classes (FAO)", "Live weight sliders", "GeoTIFF · GeoPackage · Shapefile"],
+       eyebrow=tr("For GIS staff & planners", "GIS কৰ্মী আৰু পৰিকল্পনাকাৰীৰ বাবে"))
+if tr("en", "as") == "as":
+    st.caption("এই পৃষ্ঠাটো GIS কৰ্মীৰ বাবে; কাৰিকৰী শব্দৰ বাবে ইয়াৰ বিৱৰণ ইংৰাজীত ৰখা হৈছে।")
 with st.sidebar:
     st.markdown("**Analysis settings**")
     dkey = st.selectbox("District", available,
@@ -75,7 +78,8 @@ c4.metric("Satellite: vacant + long fallow", f"{val['model_vacant_plus_long_fall
 c5.metric("Official vacant cultivable (DES 2020-21)", f"{val.get('official_vacant_cultivable_ha') or 0:,} ha")
 
 tab_map, tab_why, tab_dl, tab_val, tab_method = st.tabs(
-    ["🗺️ Map & ranking", "❓ Why this result", "⬇️ Downloads", "✅ Validation", "⚙️ Method & scalability"])
+    [":material/map: Map & ranking", ":material/help: Why this result", ":material/download: Downloads",
+     ":material/verified: Validation", ":material/settings: Method & scalability"])
 
 with tab_map:
     left, right = st.columns([3, 2])

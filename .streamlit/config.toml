@@ -1,9 +1,21 @@
 [theme]
 base = "light"
-primaryColor = "#127a36"
-backgroundColor = "#fbfdfb"
-secondaryBackgroundColor = "#eef7ee"
-textColor = "#1d2a22"
+primaryColor = "#1d6b3a"
+backgroundColor = "#f6f4ee"
+secondaryBackgroundColor = "#efebe1"
+textColor = "#16231d"
+borderColor = "#e4dfd2"
+baseRadius = "0.85rem"
+buttonRadius = "2rem"
+font = "Manrope:https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+headingFont = "Manrope:https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+
+[theme.sidebar]
+backgroundColor = "#fbfaf6"
+secondaryBackgroundColor = "#f1eee5"
 
 [server]
 headless = true
+
+[client]
+toolbarMode = "viewer"

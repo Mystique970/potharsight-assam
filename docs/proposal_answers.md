@@ -39,7 +39,7 @@ PotharSight Assam is a configurable geospatial pipeline plus a web dashboard.
 4. **Explanation:** every cell and site stores its factor scores, limiting and strongest factor, and a plain-language reason.
 5. **Prioritisation:** S1/S2 land ≥ 0.5 ha forms *priority sites* (a parcel proxy until cadastral data is shared), ranked district-wide and per block; blocks and revenue circles get a priority index.
 6. **Programme profiles:** field crops and horticulture, each with its own limits and weights; new crops are added in the config file.
-7. **PotharSight web portal (sign-in)** with five sections:
+7. **PotharSight web portal (sign-in)**, works on desktop and phone, with an English / Assamese (অসমীয়া) switch, in five sections:
    - **Home:** all districts at a glance. Unused land found, suitable land, second-crop potential, district maps and quick links.
    - **Find land for farming:** a guided search in plain language for officials. Choose the district, what to grow and the type of land; get sites graded A–D with a map, Google Maps links, a 6-factor profile, strong points, problems and a suggestion for each site (for example "add a rabi crop – mustard or lentil"), plus Excel, Google Earth and GIS downloads.
    - **Compare districts & blocks:** a ranking of blocks and revenue circles across districts, with the main problem of each, to place programme targets.
@@ -58,8 +58,8 @@ PotharSight Assam is a configurable geospatial pipeline plus a web dashboard.
 
 ## 3. User journey, wireframes & prototype
 
-**User journey** (diagram in the Proof of Work PDF):
-0. The officer **signs in** to the PotharSight portal with a user ID and password.
+**User journey** (screens for each step, on desktop and phone, in the Proof of Work PDF; formulas and a worked example in the Technical Annex):
+0. The officer **signs in** to the PotharSight portal with a user ID and password, on a desktop or phone, and picks English or Assamese.
 1. The officer selects a **district** (Kamrup Rural, Cachar, Lakhimpur or Dibrugarh in the prototype) and a **programme** (field crops or horticulture).
 2. The **summary cards** show the priority land area, the number of patches, and the official vacant-cultivable figure next to the model figure.
 3. The **map** shows the suitability classes over a satellite basemap, block boundaries with their rank, and the priority patches.
@@ -284,7 +284,7 @@ Advisors we will seek: a soil scientist from AAU Jorhat or a KVK, and the ASSAC 
 **What is new:**
 1. **Availability and suitability in one layer:** the tool identifies land that is both under-used (from multi-year land cover and season-specific NDVI) and suitable, separating "vacant", "long fallow" and "rabi fallow" opportunities.
 2. **Explainable at every level:** each cell and patch carries its six factor scores, limiting factor and plain-language reason. This supports accountable decisions and grievance redress.
-3. **Programme-aware and live:** different profiles and live weight sliders let each department ask its own question of the same data.
+3. **Programme-aware and live:** different profiles and live weight sliders let each department ask its own question of the same data; the portal works on phones and in Assamese for field officers.
 4. **Flood-aware for Assam:** a Sentinel-1 radar flood-frequency layer (cloud-independent during the monsoon) is built into both constraints and scores.
 5. **Evidence-checked:** results are compared automatically with official DES statistics and tested for sensitivity.
 6. **Replicable at near-zero data cost:**

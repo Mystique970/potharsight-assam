@@ -9,6 +9,8 @@ import pandas as pd
 import yaml
 from PIL import Image
 
+from doc_style import FONTS, b64
+
 ROOT = Path(__file__).resolve().parents[1]
 POW = ROOT / "docs" / "pow"
 cfg = yaml.safe_load((ROOT / "config.yaml").read_text())
@@ -29,27 +31,48 @@ def img(p, h="100%", maxpx=1300):
     return f'<img src="data:image/jpeg;base64,{base64.b64encode(b.getvalue()).decode()}" style="max-height:{h};max-width:100%">'
 
 
+def lap(p, h="138mm", maxpx=1500):
+    return f"<div style='text-align:center'><div class='lap'>{img(p, h, maxpx)}</div></div>"
+
+
 V = {d: json.loads((OUT / d / "field_crops" / "tables" / "validation.json").read_text()) for d in DIST}
 PP = {d: pd.read_csv(OUT / d / "field_crops" / "tables" / "priority_patches.csv") for d in DIST}
 BL = {d: pd.read_csv(OUT / d / "field_crops" / "tables" / "blocks_ranking.csv") for d in DIST}
 
-css = """@page { size: 338mm 190mm; margin: 0; } body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: #1d2a22; }
-.s { width: 338mm; height: 190mm; box-sizing: border-box; padding: 13mm 16mm; page-break-after: always; position: relative; overflow: hidden; }
-h1 { font-size: 40pt; color: #14532d; margin: 0; } h2 { font-size: 25pt; color: #14532d; margin: 0 0 7mm; border-left: 8px solid #1a9850; padding-left: 10px; }
-p, li { font-size: 15pt; line-height: 1.4; } .big { font-size: 34pt; font-weight: 700; color: #14532d; } .lab { font-size: 12.5pt; color: #4b5563; }
-.cols { display: flex; gap: 10mm; } .c { flex: 1; } .k { background: #f0fdf4; border-left: 6px solid #1a9850; padding: 4mm 5mm; margin-bottom: 4mm; }
-.foot { position: absolute; bottom: 6mm; right: 16mm; font-size: 10pt; color: #6b7280; } .green { background: #14532d; color: white; }
-.green h1, .green h2, .green .big { color: white; } .green .lab { color: #d1fae5; } table { border-collapse: collapse; font-size: 13pt; width: 100%; }
-th { background: #14532d; color: white; text-align: left; padding: 5px 8px; } td { border-bottom: 1px solid #e5e7eb; padding: 4px 8px; }
-.flow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; } .b { border: 2px solid #1a9850; background: #f0fdf4; border-radius: 8px;
-padding: 8px 10px; font-size: 13pt; text-align: center; } .ar { color: #1a9850; font-size: 20pt; font-weight: bold; }"""
+css = """@page { size: 338mm 190mm; margin: 0; }
+body { margin: 0; font-family: 'Manrope', 'Noto Sans Bengali', 'Segoe UI', Arial, sans-serif; color: #16231d; }
+.s { width: 338mm; height: 190mm; box-sizing: border-box; padding: 14mm 17mm; page-break-after: always; position: relative; overflow: hidden; background: #f6f4ee; }
+h1 { font-size: 46pt; font-weight: 800; letter-spacing: -0.03em; margin: 0; line-height: 1.05; }
+h2 { font-size: 26pt; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 7mm; }
+.eb { display: inline-block; border: 1px solid #e4dfd2; background: #fbfaf6; border-radius: 999px; padding: 3px 12px; font-size: 10pt;
+  font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #3f4b44; margin-bottom: 5mm; }
+.eb i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #1d6b3a; margin-right: 7px; vertical-align: 1px; }
+p, li { font-size: 15pt; line-height: 1.45; } .big { font-size: 30pt; font-weight: 800; letter-spacing: -0.02em; } .lab { font-size: 12pt; color: #5d6a62; }
+.cols { display: flex; gap: 10mm; } .c { flex: 1; }
+.k { background: #fff; border: 1px solid #e4dfd2; border-radius: 16px; padding: 4mm 5mm; margin-bottom: 4mm; }
+.foot { position: absolute; bottom: 6mm; right: 17mm; font-size: 9.5pt; color: #8a928c; }
+.green { background: #f6f4ee; } .green h1 em { font-style: normal; color: #1d6b3a; }
+table { border-collapse: collapse; font-size: 13pt; width: 100%; background: #fff; border-radius: 12px; }
+th { text-align: left; color: #5d6a62; font-weight: 700; border-bottom: 2px solid #16231d; padding: 6px 8px; font-size: 11.5pt; }
+td { border-bottom: 1px solid #e4dfd2; padding: 5px 8px; }
+.flow { display: flex; gap: 6px; align-items: stretch; flex-wrap: nowrap; }
+.b { flex: 1; border: 1px solid #e4dfd2; background: #fff; border-radius: 14px; padding: 10px 10px; font-size: 13pt; font-weight: 700; }
+.b small { display: block; font-weight: 500; color: #5d6a62; font-size: 10.5pt; margin-top: 3px; }
+.ar { color: #1d6b3a; font-size: 20pt; font-weight: 800; align-self: center; }
+img { border-radius: 10px; }
+.lap { background: #1d2420; border-radius: 12px 12px 0 0; padding: 7px; display: inline-block; } .lap img { display: block; border-radius: 3px; }
+.ph { background: #18211c; border-radius: 20px; padding: 5px; } .ph img { display: block; width: 100%; border-radius: 15px; }
+"""
 
 S = []
 foot = '<div class="foot">PotharSight Assam · NESFIC 2026 · D13</div>'
 tot_pp = sum(PP[d].area_ha.sum() for d in DIST)
-S.append(f"""<div class="s green"><div style="margin-top:28mm"><div class="lab">NESFIC 2026 · Challenge D13 · DST Assam – ASSAC</div>
-<h1 style="font-size:54pt">PotharSight Assam</h1><p style="font-size:21pt">Find, rank and explain cultivable & fertile land –<br>
-an open, explainable spatial decision-support layer</p><p class="lab">Working prototype on real data · {", ".join(NAME.values())}</p></div></div>""")
+S.append(f"""<div class="s green"><div class="cols" style="align-items:center;height:100%"><div class="c" style="flex:1.15">
+<div class="eb"><i></i>NESFIC 2026 · Challenge D13 · DST Assam – ASSAC</div>
+<h1 style="font-size:52pt">Find land that can be farmed — <em>and know why.</em></h1>
+<p style="font-size:19pt;color:#5d6a62;margin-top:6mm"><b style="color:#16231d">PotharSight Assam</b> · পথাৰছাইট – an open, explainable decision-support portal</p>
+<p class="lab">Working prototype on real data · {", ".join(NAME.values())} · web + mobile · English + অসমীয়া</p></div>
+<div class="c" style="flex:0.85">{img(POW / 'screens' / 'portal_1_home.png', '120mm', 1300)}</div></div></div>""")
 S.append(f"""<div class="s"><h2>The problem</h2><div class="cols"><div class="c">
 <p>Assam reports large areas of <b>culturable waste and fallow land</b> – but only as district totals in tables.</p>
 <ul><li>Planners cannot see <b>where</b> it is, <b>how suitable</b> it is, or <b>why</b></li>
@@ -76,9 +99,16 @@ for d in DIST:
 <div class="c"><div class="k"><div class="big">{PP[d].area_ha.sum():,.0f} ha</div><div class="lab">S1/S2 priority land for field crops · {len(PP[d]):,} patches ≥ 0.5 ha</div></div>
 <div class="k"><div class="big">{V[d]['model_vacant_plus_long_fallow_ha']:,} ha</div><div class="lab">satellite vacant + long fallow (official {V[d]['official_vacant_cultivable_ha']:,})</div></div>
 <table><tr><th>#</th><th>Block</th><th>S1 ha</th><th>S2 ha</th><th>Main limitation</th></tr>{rows}</table></div></div>{foot}</div>""")
-S.append(f"""<div class="s"><h2>PotharSight portal – guided search for officials (working)</h2>{img(POW / 'screens' / 'portal_5_results_map.png', '150mm', 1600)}{foot}</div>""")
+S.append(f"""<div class="s"><div class="eb"><i></i>Live prototype</div><h2>Guided search for officials – four taps to a ranked shortlist</h2>{lap(POW / 'screens' / 'portal_5_results.png', '128mm', 1600)}{foot}</div>""")
+SC = POW / "screens"
+ph = "".join(f"<div class='c'><div class='ph'><img src='{b64(SC / n, 520)}'></div><p class='lab' style='text-align:center;margin-top:2mm'>{c}</p></div>"
+             for n, c in [("mobile_2_district.png", "Step 1 · district"), ("mobile_5_results_map.png", "Map of sites A–D"),
+                          ("mobile_6_results_list.png", "Reasons per site"), ("as_mobile_1_home.png", "অসমীয়া · home"),
+                          ("as_mobile_6_results_list.png", "অসমীয়া · reasons")] if (SC / n).exists())
+S.append(f"""<div class="s"><div class="eb"><i></i>Web + mobile · English + অসমীয়া</div><h2>Works on a field officer's phone, in Assamese</h2>
+<div class="cols" style="gap:7mm">{ph}</div>{foot}</div>""")
 r0 = PP[DIST[0]].iloc[0]
-S.append(f"""<div class="s"><h2>Every result explains itself</h2><div class="cols"><div class="c">{img(POW / 'screens' / 'portal_6_results_list.png', '130mm', 1100)}</div>
+S.append(f"""<div class="s"><h2>Every result explains itself</h2><div class="cols"><div class="c">{img(POW / 'screens' / 'portal_6_results_list.png', '125mm', 1100)}</div>
 <div class="c"><div class="k"><b>Rank 1 · {r0.block} · {r0.area_ha:.1f} ha · {r0.status_name}</b><p>{r0.reason}</p></div>
 <ul><li>Six 0–100 factor scores per cell and patch</li><li>Limiting and strongest factor stored as GIS layers</li>
 <li>Criteria and data sources recorded → auditable, challengeable decisions</li></ul></div></div>{foot}</div>""")
@@ -99,7 +129,7 @@ S.append(f"""<div class="s"><h2>Built to scale across Assam and beyond</h2><tabl
 <tr><td>A new crop / programme</td><td>New profile: limits + weights</td></tr><tr><td>ASSAC / department data (LULC, Soil Health Card, ASDMA flood, cadastre)</td><td>Replace a layer file – no code change</td></tr></table>
 <p><b>Open & low-cost:</b> 100 % free data, open-source stack, runs on a laptop; outputs load into Bhuvan, QGIS, ArcGIS.</p>{foot}</div>""")
 S.append(f"""<div class="s"><h2>Roadmap & ask</h2><div class="cols"><div class="c"><table><tr><th>When</th><th>Milestone</th></tr>
-<tr><td>Done</td><td>{len(DIST)}-district prototype, guided portal, GIS exports, validation</td></tr><tr><td>Dec 2026</td><td>Criteria workshop with ASSAC & departments</td></tr>
+<tr><td>Done</td><td>{len(DIST)}-district prototype, guided portal (web + mobile, English + Assamese), GIS exports, validation</td></tr><tr><td>Dec 2026</td><td>Criteria workshop with ASSAC & departments</td></tr>
 <tr><td>Jan 2027</td><td>Department data; crop profiles; ML fallow classifier</td></tr><tr><td>Feb 2027</td><td>Demo Day – hosted, field-verification module</td></tr>
 <tr><td>Mar 2027</td><td>Ready for field validation</td></tr><tr><td>May 2027</td><td>MVP: 4–6 districts, roles, audit log</td></tr></table></div>
 <div class="c"><p><b>We need from the department</b></p><ul><li>ASSAC LULC / wasteland layers and imagery</li><li>Soil Health Card points</li>
@@ -107,8 +137,8 @@ S.append(f"""<div class="s"><h2>Roadmap & ask</h2><div class="cols"><div class="
 <p class="lab">Decision support only – ownership verified by the Revenue Department before any allocation.</p></div></div>{foot}</div>""")
 
 html = POW / "PotharSight_Assam_D13_Pitch_Deck.html"
-html.write_text(f"<html><head><meta charset='utf-8'><style>{css}</style></head><body>{''.join(S)}</body></html>", encoding="utf-8")
+html.write_text(f"<html><head><meta charset='utf-8'>{FONTS}<style>{css}</style></head><body>{''.join(S)}</body></html>", encoding="utf-8")
 pdf = POW / "PotharSight_Assam_D13_Pitch_Deck.pdf"
-subprocess.run([r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe", "--headless", "--disable-gpu", "--no-pdf-header-footer",
+subprocess.run([r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe", "--headless", "--disable-gpu", "--no-pdf-header-footer", "--virtual-time-budget=15000",
                 f"--print-to-pdf={pdf}", html.as_uri()], check=False, timeout=180)
 print(pdf, f"{pdf.stat().st_size / 1e6:.1f} MB" if pdf.exists() else "NOT CREATED")
