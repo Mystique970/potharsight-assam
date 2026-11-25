@@ -17,7 +17,7 @@ sys.path.insert(0, str(APP.parent))
 sys.path.insert(0, str(APP))
 
 st.set_page_config(page_title="PotharSight Assam – land for farming", page_icon=str(APP / "assets" / "icon.svg"), layout="wide")
-from theme import CSS, DISTRICTS, DNAME, OUT, icon, lang_switch, tile_html, tr  # noqa: E402
+from theme import CSS, DISTRICTS, DNAME, OUT, TONES, icon, lang_switch, tile_html, tr  # noqa: E402
 import pandas as pd  # noqa: E402
 
 # Public demo account shown on the sign-in page so evaluators can enter directly (prototype only).
@@ -113,14 +113,14 @@ def login_page():
                     st.error(tr(*st.session_state.login_error))
         st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
         c = st.columns(3)
-        for col, (ic, t1, d1) in zip(c, [
+        for col, (ic, t1, d1), tone in zip(c, [
                 ("travel_explore", tr("Find land", "মাটি বিচাৰক"), tr("Guided search in plain language — no GIS skills needed.",
                                                                   "সহজ ভাষাত নিৰ্দেশিত সন্ধান — GIS জ্ঞানৰ প্ৰয়োজন নাই।")),
                 ("leaderboard", tr("Rank blocks", "ব্লকৰ ক্ৰম"), tr("See where to place programme targets first.",
                                                                  "আঁচনিৰ লক্ষ্য প্ৰথমে ক'ত দিব চাওক।")),
                 ("fact_check", tr("See why", "কাৰণ চাওক"), tr("Every site explains its strengths and problems.",
-                                                           "প্ৰতিটো স্থানে নিজৰ সবল দিশ আৰু সমস্যা দেখুৱায়।"))]):
-            col.markdown(tile_html(ic, t1, d1), unsafe_allow_html=True)
+                                                           "প্ৰতিটো স্থানে নিজৰ সবল দিশ আৰু সমস্যা দেখুৱায়।"))], TONES):
+            col.markdown(tile_html(ic, t1, d1, tone), unsafe_allow_html=True)
         st.markdown("<div class='ps-foot'>" + tr(
             "Prototype for NESFIC 2026 · Challenge D13 (DST Assam – ASSAC). Built on free, open data. "
             "Production version: department log-ins with roles and an audit log.",

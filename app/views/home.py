@@ -2,7 +2,7 @@
 import pandas as pd
 import streamlit as st
 
-from theme import DISTRICTS, DNAME, OUT, banner, bars, desc, footer, h2, icon, kpi, tile_html, tr, validation
+from theme import DISTRICTS, DNAME, OUT, TONES, banner, bars, desc, footer, h2, icon, kpi, tile_html, tr, validation
 
 banner(tr("Where can new land be <em>farmed</em> in Assam?", "অসমত নতুনকৈ ক'ত <em>খেতি</em> কৰিব পাৰি?"),
        tr("Satellite data shows where unused land is, how good it is and why. Pick a task or a district to begin.",
@@ -27,12 +27,12 @@ T = overview()
 HA = tr("ha", "হেক্টৰ")
 
 c = st.columns(4)
-kpi(c[0], f"{len(DISTRICTS)}", tr("districts — the top 4 in Assam for unused cultivable land", "জিলা — অব্যৱহৃত খেতিযোগ্য মাটিত অসমৰ শীৰ্ষ ৪"))
-kpi(c[1], f"{T.satellite.sum():,.0f} {HA}", tr("unused land seen by satellite (empty or left for years)",
+kpi(c[0], f"{len(DISTRICTS)}", tone="green", ic="location_on", label=tr("districts — the top 4 in Assam for unused cultivable land", "জিলা — অব্যৱহৃত খেতিযোগ্য মাটিত অসমৰ শীৰ্ষ ৪"))
+kpi(c[1], f"{T.satellite.sum():,.0f} {HA}", tone="amber", ic="satellite_alt", label=tr("unused land seen by satellite (empty or left for years)",
                                               "উপগ্ৰহে দেখা অব্যৱহৃত মাটি (খালী বা বহু বছৰ পতিত)"))
-kpi(c[2], f"{T.priority.sum():,.0f} {HA}", tr(f"suitable land for field crops in {T.sites.sum():,} sites",
+kpi(c[2], f"{T.priority.sum():,.0f} {HA}", tone="blue", ic="verified", label=tr(f"suitable land for field crops in {T.sites.sum():,} sites",
                                              f"{T.sites.sum():,}টা স্থানত পথাৰ শস্যৰ উপযুক্ত মাটি"))
-kpi(c[3], f"{T.incl_rabi.sum() - T.satellite.sum():,.0f} {HA}", tr("paddy land empty in winter — a second-crop chance",
+kpi(c[3], f"{T.incl_rabi.sum() - T.satellite.sum():,.0f} {HA}", tone="clay", ic="ac_unit", label=tr("paddy land empty in winter — a second-crop chance",
                                                                   "শীতত খালী থকা ধাননি — দ্বিতীয় শস্যৰ সুযোগ"))
 
 h2(tr("What would you like to do?", "আপুনি কি কৰিব বিচাৰে?"))
@@ -49,9 +49,9 @@ tiles = [("travel_explore", tr("Find land for farming", "খেতিৰ মা�
           tr("Data sources, criteria, accuracy checks and how to add new districts.", "তথ্যৰ উৎস, মাপকাঠি, সঠিকতা পৰীক্ষা আৰু নতুন জিলা যোগ কৰাৰ উপায়।"),
           "views/about.py")]
 cols = st.columns(4)
-for col, (ic, t, d, page) in zip(cols, tiles):
+for col, (ic, t, d, page), tone in zip(cols, tiles, TONES):
     with col:
-        st.markdown(tile_html(ic, t, d), unsafe_allow_html=True)
+        st.markdown(tile_html(ic, t, d, tone), unsafe_allow_html=True)
         st.page_link(page, label=tr("Open", "খোলক"), icon=":material/arrow_forward:")
 
 h2(tr("Districts", "জিলাসমূহ"))

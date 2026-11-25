@@ -25,8 +25,8 @@ with t1:
              ("leaderboard", tr("7 · Rank", "৭ · ক্ৰম"), tr("Sites, blocks and revenue circles", "স্থান, ব্লক আৰু ৰাজহ চক্ৰ"))]
     for row in (steps[:4], steps[4:]):
         cols = st.columns(4)
-        for col, (ic, t, d) in zip(cols, row):
-            col.markdown(tile_html(ic, t, d), unsafe_allow_html=True)
+        for col, (ic, t, d), tone in zip(cols, row, ["green", "amber", "blue", "clay"]):
+            col.markdown(tile_html(ic, t, d, tone), unsafe_allow_html=True)
     h2(tr("Criteria (editable in config.yaml, no code change)", "মাপকাঠি (config.yaml-ত সলনি কৰিব পাৰি, ক'ড সলনি নকৰাকৈ)"))
     fc, ho = cfg["profiles"]["field_crops"], cfg["profiles"]["horticulture"]
     st.dataframe(pd.DataFrame([

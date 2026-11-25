@@ -269,7 +269,7 @@ header[data-testid="stHeader"] {height: 2.4rem; background: transparent;}
 /* cards */
 .ps-kpi {background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px;
   height: 100%; min-height: 112px; box-sizing: border-box; box-shadow: 0 1px 2px rgba(22,35,29,0.04);}
-.ps-kpi .v {font-size: 1.85rem; font-weight: 800; color: var(--ink); line-height: 1.15; letter-spacing: -0.02em;}
+.ps-kpi .v {font-size: clamp(1.3rem, 2.1vw, 1.85rem); font-weight: 800; color: var(--ink); line-height: 1.15; letter-spacing: -0.02em; white-space: nowrap;}
 .ps-kpi .l {font-size: 0.84rem; color: var(--muted); margin-top: 4px; line-height: 1.4;}
 .ps-tile {background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px 18px 14px 18px;
   height: 100%; min-height: 176px; box-sizing: border-box; box-shadow: 0 1px 2px rgba(22,35,29,0.04);}
@@ -280,6 +280,27 @@ header[data-testid="stHeader"] {height: 2.4rem; background: transparent;}
 .ps-tile .d {font-size: 0.88rem; color: var(--muted); margin-top: 4px; line-height: 1.45;}
 [data-testid="stVerticalBlockBorderWrapper"], [data-testid="stLayoutWrapper"] > [data-testid="stVerticalBlock"][class*="border"] {background: var(--card);}
 div[data-testid="stVerticalBlock"]:has(> div > .ps-cardmark) {background: var(--card);}
+
+/* colour tones */
+.tone-green {--tc:#1d6b3a; --tb:#e6f2e4;} .tone-amber {--tc:#9a6510; --tb:#fbefd6;} .tone-blue {--tc:#2a648f; --tb:#e3eef7;}
+.tone-clay {--tc:#a84d24; --tb:#f8e6dd;} .tone-plum {--tc:#6d4a8a; --tb:#efe7f5;}
+.ps-kpi[class*="tone-"] {background: linear-gradient(160deg, var(--tb) 0%, #ffffff 62%); border-color: color-mix(in srgb, var(--tc) 18%, #e7e2d5);}
+.ps-kpi .kic {width: 34px; height: 34px; border-radius: 10px; background: var(--tb); color: var(--tc); display: flex; align-items: center;
+  justify-content: center; margin-bottom: 8px;} .ps-kpi .kic .msr {vertical-align: 0; font-size: 20px;}
+.ps-kpi[class*="tone-"] .v {color: var(--tc);}
+.ps-kpi:has(.kic) {min-height: 158px; padding-bottom: 18px;}
+[data-testid="stElementContainer"]:has(.ps-kpi) {overflow: visible;}
+.ps-tile[class*="tone-"] .ps-ic {background: var(--tb); color: var(--tc);}
+.ps-tile[class*="tone-"] {border-top: 3px solid var(--tc);}
+.ps-hero {background: radial-gradient(circle at 92% 10%, rgba(233,196,106,0.35) 0, rgba(233,196,106,0) 34%),
+  linear-gradient(115deg, #e4f0e1 0%, #f3f1e8 55%, #f8eedb 100%); border: 1px solid #e2e6d6; border-radius: 22px;
+  padding: 20px 26px 18px 26px; margin-bottom: 16px;}
+.ps-hero .ps-eyebrow {background: rgba(255,255,255,0.7);}
+.stButton > button[kind="primary"], .stDownloadButton > button[kind="primary"] {background: var(--brand) !important; border-color: var(--brand) !important; color: #fff !important;}
+.stButton > button[kind="primary"]:hover, .stDownloadButton > button[kind="primary"]:hover {background: #155530 !important; border-color: #155530 !important;}
+[data-testid="stSidebarNav"] a[aria-current="page"] {background: #e3efe1 !important;}
+[data-testid="stSidebarNav"] a[aria-current="page"] span {color: var(--brand) !important; font-weight: 700;}
+.ps-step.on {background: var(--brand) !important;}
 
 /* steps */
 .ps-steps {display: flex; gap: 6px; margin: 6px 0 14px 0; flex-wrap: wrap;}
@@ -297,7 +318,7 @@ div[data-testid="stVerticalBlock"]:has(> div > .ps-cardmark) {background: var(--
 .ps-line {display: flex; gap: 8px; align-items: flex-start; margin: 3px 0; font-size: 0.92rem; color: #26322b;}
 .ps-line .msr {color: var(--brand); margin-top: 3px;}
 .ps-line.warn .msr {color: #b4561f;} .ps-line.tip .msr {color: var(--ochre);}
-.ps-langlab {font-size: 0.75rem; font-weight: 700; color: #5d6a62; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: -6px;}
+.ps-langlab {font-size: 0.75rem; font-weight: 700; color: #5d6a62; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px 0; display: flex; align-items: center; gap: 6px;} .ps-langlab .msr {vertical-align: 0; color: var(--brand);}
 .ps-brand {display: flex; align-items: center; gap: 10px;}
 .ps-stats {display: flex; gap: 34px; margin-top: 18px; flex-wrap: wrap;}
 .ps-stats .v {font-size: 1.7rem; font-weight: 800; color: var(--ink); letter-spacing: -0.02em;}
@@ -306,8 +327,6 @@ div[data-testid="stVerticalBlock"]:has(> div > .ps-cardmark) {background: var(--
 
 /* buttons, tabs, metrics */
 .stButton > button, .stDownloadButton > button, .stLinkButton > a {font-weight: 650;}
-.stButton > button[kind="primary"], .stDownloadButton > button[kind="primary"] {background: var(--ink); border-color: var(--ink);}
-.stButton > button[kind="primary"]:hover, .stDownloadButton > button[kind="primary"]:hover {background: #2b3b33; border-color: #2b3b33;}
 [data-testid="stPageLink"] a {padding-left: 2px;}
 [data-testid="stPageLink"] p {color: var(--brand); font-weight: 650; font-size: 0.9rem;}
 [data-testid="stMetric"] {background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px 14px;}
@@ -323,6 +342,18 @@ div[data-testid="stVerticalBlock"]:has(> div > .ps-cardmark) {background: var(--
 [data-testid="stElementContainer"]:has(.ps-card-end) {margin-top: auto;}
 [class*="st-key-dcard_"] [data-testid="stImage"] img {height: 260px; width: 100%; object-fit: contain;}
 .ps-foot {color: #7a837d; font-size: 0.76rem; margin-top: 28px; border-top: 1px solid var(--line); padding-top: 10px; line-height: 1.5;}
+
+/* medium widths: two per row */
+@media (min-width: 641px) and (max-width: 1150px) {
+  [data-testid="stHorizontalBlock"]:has(.ps-kpi), [data-testid="stHorizontalBlock"]:has(.ps-tile),
+  [data-testid="stHorizontalBlock"]:has([class*="st-key-dcard_"]), [data-testid="stHorizontalBlock"]:has([class*="st-key-d_"]) {flex-wrap: wrap; row-gap: 1rem;}
+  [data-testid="stHorizontalBlock"]:has(.ps-kpi) > [data-testid="stColumn"], [data-testid="stHorizontalBlock"]:has(.ps-tile) > [data-testid="stColumn"],
+  [data-testid="stHorizontalBlock"]:has([class*="st-key-dcard_"]) > [data-testid="stColumn"],
+  [data-testid="stHorizontalBlock"]:has([class*="st-key-d_"]) > [data-testid="stColumn"] {flex: 1 1 calc(50% - 1rem) !important; min-width: calc(50% - 1rem) !important;}
+  [data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) {flex-wrap: wrap; row-gap: 0.6rem;}
+  [data-testid="stHorizontalBlock"]:has([data-testid="stMetric"]) > [data-testid="stColumn"] {flex: 1 1 calc(33% - 1rem) !important; min-width: calc(33% - 1rem) !important;}
+  .ps-kpi .v {font-size: 1.6rem;}
+}
 
 /* phones */
 @media (max-width: 640px) {
@@ -346,23 +377,28 @@ div[data-testid="stVerticalBlock"]:has(> div > .ps-cardmark) {background: var(--
 
 
 def banner(title, sub, chips=(), eyebrow=None):
-    """Clean page header: small label, large title, muted subtitle, optional meta pills."""
+    """Page header on a soft tinted band: small label, large title, muted subtitle, optional meta pills."""
     st.markdown(CSS, unsafe_allow_html=True)
     eb = f"<div class='ps-eyebrow'><i></i>{eyebrow}</div>" if eyebrow else ""
     ch = ("<div class='ps-meta'>" + "".join(f"<span>{c}</span>" for c in chips) + "</div>") if chips else ""
-    st.markdown(f"{eb}<div class='ps-h1'>{title}</div><div class='ps-sub'>{sub}</div>{ch}", unsafe_allow_html=True)
+    st.markdown(f"<div class='ps-hero'>{eb}<div class='ps-h1'>{title}</div><div class='ps-sub'>{sub}</div>{ch}</div>", unsafe_allow_html=True)
 
 
 def h2(text):
     st.markdown(f"<div class='ps-h2'>{text}</div>", unsafe_allow_html=True)
 
 
-def kpi(col, value, label):
-    col.markdown(f"<div class='ps-kpi'><div class='v'>{value}</div><div class='l'>{label}</div></div>", unsafe_allow_html=True)
+TONES = ["green", "amber", "blue", "clay"]
 
 
-def tile_html(ic, title, d):
-    return f"<div class='ps-tile'><div class='ps-ic'>{icon(ic)}</div><div class='t'>{title}</div><div class='d'>{d}</div></div>"
+def kpi(col, value, label, tone="green", ic=None):
+    k = f"<div class='kic'>{icon(ic)}</div>" if ic else ""
+    col.markdown(f"<div class='ps-kpi tone-{tone}'>{k}<div class='v'>{value}</div><div class='l'>{label}</div></div>", unsafe_allow_html=True)
+
+
+def tile_html(ic, title, d, tone="green"):
+    return (f"<div class='ps-tile tone-{tone}'><div class='ps-ic'>{icon(ic)}</div><div class='t'>{title}</div>"
+            f"<div class='d'>{d}</div></div>")
 
 
 def line(ic, text, cls=""):
